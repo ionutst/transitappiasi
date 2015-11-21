@@ -74,7 +74,9 @@ public class RealTimeScheduler {
 
                     @Override
                     public void onNext(List<ShareInfo> directionResponse) {
+
                         if (listener != null) {
+                            Log.e("realtime", "on next");
                             listener.onRealTime(directionResponse);
                         }
                     }

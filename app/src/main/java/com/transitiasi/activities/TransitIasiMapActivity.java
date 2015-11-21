@@ -4,9 +4,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -29,11 +27,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.transitiasi.R;
-import com.transitiasi.enums.Status;
 import com.transitiasi.model.DirectionResponse;
 import com.transitiasi.model.ShareInfo;
 import com.transitiasi.realtime.RealTimeScheduler;
 import com.transitiasi.retrofit.DirectionServiceApi;
+import com.transitiasi.util.CustomMarkerBuilder;
 import com.transitiasi.util.PolylineUtils;
 
 import java.util.ArrayList;
@@ -48,7 +46,7 @@ import butterknife.OnClick;
 import rx.Observer;
 import rx.schedulers.Schedulers;
 
-public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCallback,RealTimeScheduler.OnRealtimeListener {
+public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCallback, RealTimeScheduler.OnRealtimeListener {
     private static final int CODE_SHARE = 202;
     private static final LatLng IASI = new LatLng(47.155649, 27.590058);
     private GoogleMap map;
@@ -66,7 +64,6 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
 
     private Polyline polyline;
     private List<Marker> markers = new ArrayList<>(4);
-
     private List<Marker> busMarkers = new ArrayList<>(4);
 
     private String[] stations;
@@ -101,21 +98,12 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         setSupportActionBar(toolbar);
 
         ic_share = (ImageView) v.findViewById(R.id.ic_share);
-        ic_share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(TransitIasiMapActivity.this, ShareActivity.class);
-                startActivityForResult(intent, CODE_SHARE);
-            }
-        });
+        setupShare();
 
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        //PolylineUtils.buildJsonForServer();
 
         stations = getResources().getStringArray(R.array.stations);
         stationsCoordinates = new HashMap<>(stations.length);
@@ -124,7 +112,7 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
             stationsCoordinates.put(stations[i], stationsCoordinatesAsString[i]);
         }
         init();
-        RealTimeScheduler.INSTANCE.setOnRealtimeListener(this);
+
     }
 
 
@@ -132,6 +120,15 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
     protected void onDestroy() {
         super.onDestroy();
         RealTimeScheduler.INSTANCE.stop();
+	}
+    private void setupShare() {
+        ic_share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(TransitIasiMapActivity.this, ShareActivity.class);
+                startActivityForResult(intent, CODE_SHARE);
+            }
+        });
     }
 
     @Override
@@ -142,25 +139,9 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
     }
 
     private void searchForRoute(String start, String destination) {
-//        DirectionServiceApi.defaultService()
-//                .getRoutesUsingCall(DirectionServiceApi.MODE, start, destination, DirectionServiceApi.MAP_API_KEY, DirectionServiceApi.TRANSIT_MODE)
-//                .enqueue(new Callback<DirectionResponse>() {
-//                    @Override
-//                    public void onResponse(Response<DirectionResponse> response, Retrofit retrofit) {
-//                        int d = 0;
-//                        d++;
-//                    }
-//
-//                    @Override
-//                    public void onFailure(Throwable t) {
-//                        int d = 0;
-//                        d++;
-//                    }
-//                });
+
         progressDialog = ProgressDialog.show(this, null, getString(R.string.searching));
 
-//        start = "47.175776,27.571667";
-//        destination = "47.156013,27.603916";
         if (stationsCoordinates.containsKey(start)) {
             start = stationsCoordinates.get(start);
         }
@@ -204,9 +185,9 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
     }
 
     private void addAutocompleteOptions(AutoCompleteTextView autoCompleteTextView) {
-        String[] items = getResources().getStringArray(R.array.stations);
+
         ArrayAdapter<String> adapter = new ArrayAdapter<>
-                (this, android.R.layout.select_dialog_item, items);
+                (this, android.R.layout.select_dialog_item, stations);
         autoCompleteTextView.setThreshold(1);//will start working from first character
         autoCompleteTextView.setAdapter(adapter);
     }
@@ -215,10 +196,6 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        //LatLng sydney = new LatLng(47.155649, 27.590058);
-        //map.addMarker(new MarkerOptions().position(sydney).title("Iasi"));
-        //map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(IASI, (int) (map.getMaxZoomLevel() * 0.72)));
 
     }
@@ -265,16 +242,15 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         }
 
         map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds.build(), 10));
-
-        RealTimeScheduler.INSTANCE.start();
     }
 
-    private void removeBusMarkers(){
-        for(Marker marker:busMarkers){
+    private void removeBusMarkers() {
+        for (Marker marker : busMarkers) {
             marker.remove();
         }
     }
-    private void addBusMarker(LatLng latLng, Bitmap busMarker){
+
+    private void addBusMarker(LatLng latLng, Bitmap busMarker) {
         final Marker marker = map.addMarker(new MarkerOptions()
                 .position(latLng)
                 .icon(BitmapDescriptorFactory.fromBitmap(busMarker))
@@ -282,17 +258,19 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
 
         busMarkers.add(marker);
     }
+
     @Override
     public void onRealTime(List<ShareInfo> response) {
-        if(response == null){
+        if (response == null) {
             return;
         }
         removeBusMarkers();
-        for(ShareInfo shareInfo:response){
+        for (ShareInfo shareInfo : response) {
             addTransportMarker(shareInfo);
         }
         Log.d("realtime", "onRealtime");
     }
+
     private void addTransportMarker(ShareInfo shareInfo) {
 //        shareInfo.setLat(47.151135);
 //        shareInfo.setLng(27.587258);
@@ -300,27 +278,7 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
 //        shareInfo.setStatus("RED");
         LatLng latLng = new LatLng(shareInfo.getLat(), shareInfo.getLng());
 
-        Paint backgroundPaint = new Paint();
-
-        backgroundPaint.setColor(getResources().getColor(Status.fromString(shareInfo.getStatus()).color));
-
-        Paint textPaint = new Paint();
-        textPaint.setColor(Color.WHITE);
-        textPaint.setTextSize(30);
-        textPaint.setTextAlign(Paint.Align.CENTER);
-
-        backgroundPaint.setStyle(Paint.Style.FILL);
-        Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-        final int size = 80;
-        final int padding = 5;
-
-        Bitmap bmp = Bitmap.createBitmap(size, size, conf);
-        Canvas canvas = new Canvas(bmp);
-        //canvas.drawColor(Color.RED);
-
-        canvas.drawCircle(size/2, size/2, size/2-padding, backgroundPaint);
-
-        canvas.drawText(shareInfo.getLabel(), size/2, size/2+10, textPaint); // paint defines the text color, stroke width, size
+        final Bitmap bmp = CustomMarkerBuilder.buildMarkerForBus(shareInfo, getResources());
 
         addBusMarker(latLng, bmp);
     }
@@ -328,15 +286,13 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CODE_SHARE) {
+        if (resultCode == RESULT_OK && requestCode == CODE_SHARE) {
             ic_share.setImageDrawable(getResources().getDrawable(R.drawable.ic_close_share));
             ic_share.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     ic_share.setImageDrawable(getResources().getDrawable(R.drawable.ic_share));
-
-                    Intent intent = new Intent(TransitIasiMapActivity.this, ShareActivity.class);
-                    startActivityForResult(intent, CODE_SHARE);
+                    setupShare();
                 }
             });
         }
