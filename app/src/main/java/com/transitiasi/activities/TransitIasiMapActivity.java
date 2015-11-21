@@ -4,11 +4,13 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
@@ -39,7 +41,7 @@ import butterknife.OnClick;
 import rx.Observer;
 import rx.schedulers.Schedulers;
 
-public class TransitIasiMapActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCallback {
     private static final LatLng IASI = new LatLng(47.155649, 27.590058);
     private GoogleMap map;
 
@@ -62,6 +64,14 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
     void onGoClicked() {
         final String start = txtOrigin.getText().toString();
         final String end = txtDestination.getText().toString();
+        if (start.trim().isEmpty()) {
+            Toast.makeText(this, R.string.error_from_mandatory, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (end.trim().isEmpty()) {
+            Toast.makeText(this, R.string.error_destination_mandatory, Toast.LENGTH_LONG).show();
+            return;
+        }
         searchForRoute(start, end);
     }
 
@@ -69,7 +79,9 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map_activity);
+
         ButterKnife.bind(this);
+
         View v = LayoutInflater.from(this).inflate(R.layout.share_toolbar, null);
         toolbar.addView(v);
         setSupportActionBar(toolbar);
@@ -92,6 +104,7 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
         //PolylineUtils.buildJsonForServer();
 
         init();
+
     }
 
     private void searchForRoute(String start, String destination) {

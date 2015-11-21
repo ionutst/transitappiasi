@@ -41,7 +41,7 @@ import rx.Observer;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-public class ShareActivity extends AppCompatActivity {
+public class ShareActivity extends BaseActivity {
     private static final String SELECTED = "selected";
     private static final String UNSELECTED = "unselected";
     private IItemSelected itemSelected;
