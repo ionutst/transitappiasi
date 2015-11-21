@@ -66,6 +66,9 @@
     <string name="empty_transportation">Empty</string>
     <string name="comfy_transportation">Comfortable</string>
     <string name="full_transportation">Full</string>
+    <string name="is_it_crowded">Is it crowded?</string>
+    <string name="share_vehicle_location">Share vehicle location</string>
+    <string name="please_select">Please select vehicle number!</string>
 
 
     <string-array name="tram_numbers">

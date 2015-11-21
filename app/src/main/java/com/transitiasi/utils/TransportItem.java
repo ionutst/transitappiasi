@@ -5,7 +5,7 @@ package com.transitiasi.utils;
  */
 public class TransportItem {
     private String number;
-    private boolean selection;
+    private boolean selected;
 
     public String getNumber() {
         return number;
@@ -15,11 +15,11 @@ public class TransportItem {
         this.number = number;
     }
 
-    public boolean isSelection() {
-        return selection;
+    public boolean isSelected() {
+        return selected;
     }
 
-    public void setSelection(boolean selection) {
-        this.selection = selection;
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }
