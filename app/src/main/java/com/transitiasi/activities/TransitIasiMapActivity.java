@@ -2,6 +2,9 @@ package com.transitiasi.activities;
 
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
+import android.view.View;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -11,14 +14,25 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.transitiasi.R;
 
-public class TransitIasiMapActivity extends FragmentActivity implements OnMapReadyCallback {
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
+public class TransitIasiMapActivity extends FragmentActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_transit_iasi_map);
+        setContentView(R.layout.map_activity);
+
+        ButterKnife.bind(this);
+        View v = LayoutInflater.from(this).inflate(R.layout.share_toolbar, null);
+        toolbar.addView(v);
+
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
