@@ -113,6 +113,8 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         }
         init();
 
+        RealTimeScheduler.INSTANCE.setOnRealtimeListener(this);
+
     }
 
 
@@ -242,6 +244,8 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         }
 
         map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds.build(), 10));
+
+        RealTimeScheduler.INSTANCE.start();
     }
 
     private void removeBusMarkers() {
