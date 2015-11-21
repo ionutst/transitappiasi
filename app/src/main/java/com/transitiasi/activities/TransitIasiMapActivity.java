@@ -4,14 +4,11 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
@@ -119,6 +116,12 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         }
         init();
         RealTimeScheduler.INSTANCE.setOnRealtimeListener(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        RealTimeScheduler.INSTANCE.stop();
     }
 
     private void searchForRoute(String start, String destination) {
@@ -244,11 +247,19 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         }
 
         map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds.build(), 10));
+
+        RealTimeScheduler.INSTANCE.start();
     }
 
 
     @Override
     public void onRealTime(List<ShareInfo> response) {
-
+        if(response == null){
+            return;
+        }
+        for(ShareInfo shareInfo:response){
+            //call anca method
+        }
+        Log.d("realtime","onRealtime");
     }
 }

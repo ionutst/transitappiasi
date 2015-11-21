@@ -23,6 +23,7 @@ public class RealTimeScheduler {
     private OnRealtimeListener listener;
     private boolean stoped = false;
     private Handler handler;
+    private int counter;
 
     public static final RealTimeScheduler INSTANCE = new RealTimeScheduler();
 
@@ -34,7 +35,7 @@ public class RealTimeScheduler {
                 handler = new Handler();
                 Looper.loop();
             }
-        });
+        }).start();
     }
 
     private void register(){
@@ -43,6 +44,7 @@ public class RealTimeScheduler {
             public void run() {
                 if(!stoped) {
                     register();
+                    callService();
                 }
 
             }
@@ -54,7 +56,7 @@ public class RealTimeScheduler {
             return;
         }
         TransitIasiClientApi.defaultService()
-                .realtime(3)
+                .realtime(counter++)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<List<ShareInfo>>() {
