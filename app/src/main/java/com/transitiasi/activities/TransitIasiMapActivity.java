@@ -3,7 +3,11 @@ package com.transitiasi.activities;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,6 +22,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -25,6 +31,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.transitiasi.R;
+import com.transitiasi.enums.Status;
 import com.transitiasi.model.DirectionResponse;
 import com.transitiasi.model.ShareInfo;
 import com.transitiasi.realtime.RealTimeScheduler;
@@ -203,6 +210,7 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         //map.addMarker(new MarkerOptions().position(sydney).title("Iasi"));
         //map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(IASI, (int) (map.getMaxZoomLevel() * 0.72)));
+
     }
 
     private void removeMarkers() {
@@ -262,4 +270,36 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         }
         Log.d("realtime","onRealtime");
     }
+    private void addTransportMarker(ShareInfo shareInfo) {
+//        shareInfo.setLat(47.151135);
+//        shareInfo.setLng(27.587258);
+//        shareInfo.setLabel("41");
+//        shareInfo.setStatus("RED");
+        LatLng latLng = new LatLng(shareInfo.getLat(), shareInfo.getLng());
+
+        Paint backgroundPaint = new Paint();
+
+        backgroundPaint.setColor(getResources().getColor(Status.getColor(shareInfo.getStatus())));
+
+        Paint textPaint = new Paint();
+        textPaint.setColor(Color.WHITE);
+        textPaint.setTextSize(20);
+        textPaint.setTextAlign(Paint.Align.CENTER);
+
+        backgroundPaint.setStyle(Paint.Style.FILL);
+        Bitmap.Config conf = Bitmap.Config.ARGB_8888;
+        Bitmap bmp = Bitmap.createBitmap(120, 120, conf);
+        Canvas canvas = new Canvas(bmp);
+
+        canvas.drawCircle(60, 60, 25, backgroundPaint);
+
+        canvas.drawText(shareInfo.getLabel(), 60, 65, textPaint); // paint defines the text color, stroke width, size
+        map.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        .icon(BitmapDescriptorFactory.fromBitmap(bmp))
+                        .anchor(0.5f, 1)
+        );
+    }
+
+
 }
