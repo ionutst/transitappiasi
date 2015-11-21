@@ -23,22 +23,28 @@ public class RealTimeScheduler {
     private OnRealtimeListener listener;
     private boolean stoped = false;
     private Handler handler;
-    private int counter;
+    private int counter = 2;
 
     public static final RealTimeScheduler INSTANCE = new RealTimeScheduler();
 
     private RealTimeScheduler(){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Looper.prepare();
-                handler = new Handler();
-                Looper.loop();
-            }
-        }).start();
+
     }
 
     private void register(){
+        Log.d("realtime","register");
+        if(handler == null){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Looper.prepare();
+                    handler = new Handler();
+                    register();
+                    Looper.loop();
+                }
+            }).start();
+            return;
+        }
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -55,6 +61,7 @@ public class RealTimeScheduler {
         if(stoped){
             return;
         }
+        Log.d("realtime","callservice");
         TransitIasiClientApi.defaultService()
                 .realtime(counter++)
                 .subscribeOn(Schedulers.newThread())
@@ -82,11 +89,14 @@ public class RealTimeScheduler {
     }
 
     public synchronized void start(){
+        Log.d("realtime","start");
+        stoped = false;
         register();
     }
 
     public synchronized void stop(){
         stoped = true;
+        Log.d("realtime","stoped");
     }
 
     public void setOnRealtimeListener(OnRealtimeListener listener){

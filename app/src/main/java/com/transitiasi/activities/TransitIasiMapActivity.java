@@ -4,9 +4,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -29,7 +27,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.transitiasi.R;
-import com.transitiasi.enums.Status;
 import com.transitiasi.model.DirectionResponse;
 import com.transitiasi.model.ShareInfo;
 import com.transitiasi.realtime.RealTimeScheduler;
@@ -116,8 +113,16 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         }
         init();
 
+        RealTimeScheduler.INSTANCE.setOnRealtimeListener(this);
+
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        RealTimeScheduler.INSTANCE.stop();
+	}
     private void setupShare() {
         ic_share.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,6 +131,13 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
                 startActivityForResult(intent, CODE_SHARE);
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        RealTimeScheduler.INSTANCE.stop();
+
     }
 
     private void searchForRoute(String start, String destination) {
@@ -232,6 +244,8 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         }
 
         map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds.build(), 10));
+
+        RealTimeScheduler.INSTANCE.start();
     }
 
     private void removeBusMarkers() {
