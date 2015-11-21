@@ -60,4 +60,51 @@
         <item>str. Eternitate</item>
     </string-array>
 
+    <string name="tram">Tram</string>
+    <string name="bus">Bus</string>
+    <string name="minibus">Minibus</string>
+
+
+    <string-array name="tram_numbers">
+        <item>1</item>
+        <item>3</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>11</item>
+        <item>13</item>
+    </string-array>
+
+
+    <string-array name="bus_numbers">
+        <item>5</item>
+        <item>19</item>
+        <item>28</item>
+        <item>30</item>
+        <item>30b</item>
+        <item>41</item>
+        <item>41b</item>
+        <item>42</item>
+        <item>43</item>
+        <item>43c</item>
+        <item>46</item>
+        <item>50</item>
+        <item>6b</item>
+        <item>27</item>
+        <item>29</item>
+        <item>44</item>
+        <item>47</item>
+    </string-array>
+
+
+    <string-array name="minibus_numbers">
+        <item>14</item>
+        <item>14b</item>
+        <item>14c</item>
+        <item>20</item>
+        <item>48</item>
+        <item>49</item>
+        <item>18</item>
+    </string-array>
+
 </resources>

@@ -52,9 +52,9 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
         setSupportActionBar(toolbar);
 
         ImageView ic_share = (ImageView) v.findViewById(R.id.ic_share);
-        ic_share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                ic_share.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
                 Intent intent = new Intent(TransitIasiMapActivity.this, ShareActivity.class);
                 startActivity(intent);
             }
