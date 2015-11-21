@@ -107,4 +107,8 @@
         <item>18</item>
     </string-array>
 
+    <string name="error.from_mandatory">From is mandatory</string>
+    <string name="error.destination_mandatory">Destination is mandatory</string>
+    <string name="searching">Searching</string>
+    <string name="no_route_found">No route found</string>
 </resources>
