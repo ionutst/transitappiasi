@@ -4,6 +4,14 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:text="@string/share_vehicle_location"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/toolbar_text_size" />
+
     <ImageView
         android:id="@+id/ic_validate"
         android:layout_width="wrap_content"
