@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +27,7 @@ import com.transitiasi.model.ShareInfo;
 import com.transitiasi.model.ShareInfoResponse;
 import com.transitiasi.retrofit.DirectionServiceApi;
 import com.transitiasi.retrofit.TransitIasiClientApi;
+import com.transitiasi.util.PlatformUtils;
 import com.transitiasi.util.PolylineUtils;
 import com.transitiasi.utils.TransportItem;
 
@@ -73,6 +75,9 @@ public class ShareActivity extends AppCompatActivity {
     @Bind(R.id.iv_comfy_transportation)
     ImageView iv_comfy_transportation;
 
+    @Bind(R.id.progress)
+    ProgressBar progress;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +105,11 @@ public class ShareActivity extends AppCompatActivity {
         iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateCurrentLocation();
+                if (PlatformUtils.isLocationEnabled(ShareActivity.this)) {
+                    updateCurrentLocation();
+                } else {
+                    Toast.makeText(ShareActivity.this, R.string.please_turn_on_location, Toast.LENGTH_SHORT).show();
+                }
                 Log.d("INFO", shareInfo.getLat() + " " + shareInfo.getLng());
             }
         });
@@ -259,13 +268,19 @@ public class ShareActivity extends AppCompatActivity {
                                    shareInfo.setLng(location.getLongitude());
                                    if (shareInfo.getLabel() == null) {
                                        Toast.makeText(ShareActivity.this, R.string.please_select, Toast.LENGTH_SHORT).show();
-                                   } else if (location.getLatitude() == 0 && location.getLongitude() == 0) {
-                                       Toast.makeText(ShareActivity.this, R.string.please_turn_on_location, Toast.LENGTH_SHORT).show();
-                                   } else {
-                                       sendInfo();
-                                       Intent intent = new Intent(ShareActivity.this, TransitIasiMapActivity.class);
-                                       startActivity(intent);
+                                       return;
                                    }
+
+                                   if (!PlatformUtils.isNetworkAvailable(ShareActivity.this)) {
+                                       Toast.makeText(ShareActivity.this, R.string.please_turn_on_internet, Toast.LENGTH_SHORT).show();
+                                       return;
+                                   }
+                                   if (location.getLatitude() == 0 && location.getLongitude() == 0) {
+                                       Toast.makeText(ShareActivity.this, R.string.please_turn_on_location, Toast.LENGTH_SHORT).show();
+                                       return;
+                                   }
+                                   sendInfo();
+
                                }
                            }
 
@@ -273,6 +288,7 @@ public class ShareActivity extends AppCompatActivity {
     }
 
     private void sendInfo() {
+        progress.setVisibility(View.VISIBLE);
         TransitIasiClientApi.defaultService()
                 .shareLocation(shareInfo)
                 .subscribeOn(Schedulers.newThread())
@@ -289,8 +305,16 @@ public class ShareActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onNext(ShareInfoResponse response) {
-                        Toast.makeText(ShareActivity.this, response.getResponse(), Toast.LENGTH_SHORT).show();
+                    public void onNext(final ShareInfoResponse response) {
+                        Log.d("INFO", response.getResponse());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                progress.setVisibility(View.GONE);
+                                Toast.makeText(ShareActivity.this, response.getResponse(), Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                        });
                     }
                 });
 

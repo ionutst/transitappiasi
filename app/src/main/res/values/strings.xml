@@ -118,4 +118,5 @@
     <string name="searching">Searching</string>
     <string name="no_route_found">No route found</string>
     <string name="please_turn_on_location">Please turn on your location</string>
+    <string name="please_turn_on_internet">Please turn on your internet connection</string>
 </resources>
