@@ -4,11 +4,14 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
@@ -32,8 +35,10 @@ import com.transitiasi.retrofit.DirectionServiceApi;
 import com.transitiasi.util.PolylineUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -41,7 +46,7 @@ import butterknife.OnClick;
 import rx.Observer;
 import rx.schedulers.Schedulers;
 
-public class TransitIasiMapActivity extends AppCompatActivity implements OnMapReadyCallback,RealTimeScheduler.OnRealtimeListener {
+public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCallback,RealTimeScheduler.OnRealtimeListener {
     private static final LatLng IASI = new LatLng(47.155649, 27.590058);
     private GoogleMap map;
 
@@ -59,11 +64,22 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
     private Polyline polyline;
     private List<Marker> markers = new ArrayList<>(4);
 
+    private String[] stations;
+    private Map<String, String> stationsCoordinates;
+
     //click listeners
     @OnClick(R.id.imgb_go)
     void onGoClicked() {
         final String start = txtOrigin.getText().toString();
         final String end = txtDestination.getText().toString();
+        if (start.trim().isEmpty()) {
+            Toast.makeText(this, R.string.error_from_mandatory, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (end.trim().isEmpty()) {
+            Toast.makeText(this, R.string.error_destination_mandatory, Toast.LENGTH_LONG).show();
+            return;
+        }
         searchForRoute(start, end);
     }
 
@@ -71,7 +87,9 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map_activity);
+
         ButterKnife.bind(this);
+
         View v = LayoutInflater.from(this).inflate(R.layout.share_toolbar, null);
         toolbar.addView(v);
         setSupportActionBar(toolbar);
@@ -93,6 +111,12 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
 
         //PolylineUtils.buildJsonForServer();
 
+        stations = getResources().getStringArray(R.array.stations);
+        stationsCoordinates = new HashMap<>(stations.length);
+        String[] stationsCoordinatesAsString = getResources().getStringArray(R.array.stations);
+        for (int i = 0; i < stationsCoordinatesAsString.length; i++) {
+            stationsCoordinates.put(stations[i], stationsCoordinatesAsString[i]);
+        }
         init();
         RealTimeScheduler.INSTANCE.setOnRealtimeListener(this);
     }
@@ -114,6 +138,16 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
 //                    }
 //                });
         progressDialog = ProgressDialog.show(this, null, getString(R.string.searching));
+
+//        start = "47.175776,27.571667";
+//        destination = "47.156013,27.603916";
+        if (stationsCoordinates.containsKey(start)) {
+            start = stationsCoordinates.get(start);
+        }
+        if (stationsCoordinates.containsKey(destination)) {
+            destination = stationsCoordinates.get(destination);
+        }
+        Log.d("coordinates", "start: " + start + " destination: " + destination);
 
         DirectionServiceApi.defaultService()
                 .getRoutes(DirectionServiceApi.MODE.toLowerCase(), start, destination, DirectionServiceApi.MAP_API_KEY, DirectionServiceApi.TRANSIT_MODE)

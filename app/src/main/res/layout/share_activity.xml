@@ -4,89 +4,104 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <android.support.v7.widget.CardView
-            android:id="@+id/card_tram"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/activity_horizontal_margin_small">
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-            <include
-                android:id="@+id/tram_card"
-                layout="@layout/share_transportation_card" />
-
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:id="@+id/card_bus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/activity_horizontal_margin_small">
-
-
-            <include
-                android:id="@+id/bus_card"
-                layout="@layout/share_transportation_card" />
-
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:id="@+id/card_minibus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/activity_horizontal_margin_small">
-
-            <include
-                android:id="@+id/minibus_card"
-                layout="@layout/share_transportation_card" />
-
-        </android.support.v7.widget.CardView>
-
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/activity_horizontal_margin_small">
-
-            <LinearLayout
+            <android.support.v7.widget.CardView
+                android:id="@+id/card_tram"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_margin="@dimen/activity_horizontal_margin_small">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/activity_horizontal_margin_medium"
-                    android:layout_marginRight="@dimen/activity_horizontal_margin_medium"
-                    android:text="@string/is_it_crowded"
-                    android:textSize="@dimen/text_size"
-                    android:layout_marginTop="@dimen/activity_horizontal_margin_medium"/>
+                <include
+                    android:id="@+id/tram_card"
+                    layout="@layout/share_transportation_card" />
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/card_bus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_horizontal_margin_small">
+
+
+                <include
+                    android:id="@+id/bus_card"
+                    layout="@layout/share_transportation_card" />
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/card_minibus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_horizontal_margin_small">
+
+                <include
+                    android:id="@+id/minibus_card"
+                    layout="@layout/share_transportation_card" />
+
+            </android.support.v7.widget.CardView>
+
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_horizontal_margin_small">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="@dimen/activity_horizontal_margin_medium"
-                    android:orientation="horizontal">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                    <include layout="@layout/empty_transportation_layout" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/activity_horizontal_margin_medium"
+                        android:layout_marginRight="@dimen/activity_horizontal_margin_medium"
+                        android:layout_marginTop="@dimen/activity_horizontal_margin_medium"
+                        android:text="@string/is_it_crowded"
+                        android:textSize="@dimen/text_size" />
 
-                    <include layout="@layout/comfy_transportation_layout" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="@dimen/activity_horizontal_margin_medium"
+                        android:orientation="horizontal">
 
-                    <include layout="@layout/full_transportation_layout" />
+                        <include layout="@layout/empty_transportation_layout" />
+
+                        <include layout="@layout/comfy_transportation_layout" />
+
+                        <include layout="@layout/full_transportation_layout" />
+                    </LinearLayout>
                 </LinearLayout>
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
-    </LinearLayout>
+            </android.support.v7.widget.CardView>
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_gravity="center"/>
+    </FrameLayout>
+
 </ScrollView>
 
