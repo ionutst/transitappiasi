@@ -16,10 +16,16 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.transitiasi.R;
+import com.transitiasi.model.DirectionResponse;
+import com.transitiasi.retrofit.DirectionServiceApi;
+import com.transitiasi.retrofit.TransitIasiClientApi;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import retrofit.Callback;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 public class TransitIasiMapActivity extends AppCompatActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
@@ -51,6 +57,20 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        DirectionServiceApi.defaultService().getRoutes("Copou","Podu Ros","AIzaSyD1kGlEz8q64IFtf1oqBEBlHA_WiuZYjI8").enqueue(new Callback<DirectionResponse>() {
+            @Override
+            public void onResponse(Response<DirectionResponse> response, Retrofit retrofit) {
+                int d = 0;
+                d++;
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                int d = 0;
+                d++;
+            }
+        });
     }
 
 
