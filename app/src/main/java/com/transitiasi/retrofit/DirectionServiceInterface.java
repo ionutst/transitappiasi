@@ -17,5 +17,9 @@ import rx.Observable;
  */
 public interface DirectionServiceInterface {
     @GET("json")
-    Observable<DirectionResponse> getRoutes(@Query("origin") String origin, @Query("destination") String destination, @Query("key") String key);
+    Observable<DirectionResponse> getRoutes(@Query("mode") String transit, @Query("origin") String origin, @Query("destination") String destination, @Query("key") String key, @Query("transit_mode") String transitMode);
+
+    //for debug
+    @GET("json")
+    Call<DirectionResponse> getRoutesUsingCall(@Query("mode") String transit, @Query("origin") String origin, @Query("destination") String destination, @Query("key") String key, @Query("transit_mode") String transitMode);
 }
