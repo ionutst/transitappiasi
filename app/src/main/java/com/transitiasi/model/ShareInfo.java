@@ -4,6 +4,8 @@ package com.transitiasi.model;
  * Created by Anca Todirica on 21-Nov-15.
  */
 public class ShareInfo {
+    public static final String TRAM = "T";
+
     private String label;
     private String type;
     private double lat;

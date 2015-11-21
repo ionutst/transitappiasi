@@ -50,7 +50,7 @@ import butterknife.OnClick;
 import rx.Observer;
 import rx.schedulers.Schedulers;
 
-public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCallback,RealTimeScheduler.OnRealtimeListener {
+public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCallback, RealTimeScheduler.OnRealtimeListener {
     private static final int CODE_SHARE = 202;
     private static final LatLng IASI = new LatLng(47.155649, 27.590058);
     private GoogleMap map;
@@ -263,12 +263,13 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         RealTimeScheduler.INSTANCE.start();
     }
 
-    private void removeBusMarkers(){
-        for(Marker marker:busMarkers){
+    private void removeBusMarkers() {
+        for (Marker marker : busMarkers) {
             marker.remove();
         }
     }
-    private void addBusMarker(LatLng latLng, Bitmap busMarker){
+
+    private void addBusMarker(LatLng latLng, Bitmap busMarker) {
         final Marker marker = map.addMarker(new MarkerOptions()
                 .position(latLng)
                 .icon(BitmapDescriptorFactory.fromBitmap(busMarker))
@@ -276,17 +277,19 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
 
         busMarkers.add(marker);
     }
+
     @Override
     public void onRealTime(List<ShareInfo> response) {
-        if(response == null){
+        if (response == null) {
             return;
         }
         removeBusMarkers();
-        for(ShareInfo shareInfo:response){
+        for (ShareInfo shareInfo : response) {
             addTransportMarker(shareInfo);
         }
-        Log.d("realtime","onRealtime");
+        Log.d("realtime", "onRealtime");
     }
+
     private void addTransportMarker(ShareInfo shareInfo) {
 //        shareInfo.setLat(47.151135);
 //        shareInfo.setLng(27.587258);
@@ -312,9 +315,14 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         Canvas canvas = new Canvas(bmp);
         //canvas.drawColor(Color.RED);
 
-        canvas.drawCircle(size/2, size/2, size/2-padding, backgroundPaint);
 
-        canvas.drawText(shareInfo.getLabel(), size/2, size/2+10, textPaint); // paint defines the text color, stroke width, size
+        if (shareInfo.getType().equals(ShareInfo.TRAM)) {
+            canvas.drawCircle(size / 2, size / 2, size / 2 - padding, backgroundPaint);
+        } else {
+            canvas.drawRect(0, 0, size, size, backgroundPaint);
+        }
+
+        canvas.drawText(shareInfo.getType()+shareInfo.getLabel(), size / 2, size / 2 + 10, textPaint); // paint defines the text color, stroke width, size
 
         addBusMarker(latLng, bmp);
     }
