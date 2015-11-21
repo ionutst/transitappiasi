@@ -7,14 +7,11 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
@@ -24,7 +21,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -102,13 +98,7 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         setSupportActionBar(toolbar);
 
         ic_share = (ImageView) v.findViewById(R.id.ic_share);
-        ic_share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(TransitIasiMapActivity.this, ShareActivity.class);
-                startActivityForResult(intent, CODE_SHARE);
-            }
-        });
+        setupShare();
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -126,6 +116,16 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         }
         init();
 
+    }
+
+    private void setupShare() {
+        ic_share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(TransitIasiMapActivity.this, ShareActivity.class);
+                startActivityForResult(intent, CODE_SHARE);
+            }
+        });
     }
 
     private void searchForRoute(String start, String destination) {
@@ -263,7 +263,7 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
 
         Paint backgroundPaint = new Paint();
 
-        backgroundPaint.setColor(getResources().getColor(Status.getColor(shareInfo.getStatus())));
+        backgroundPaint.setColor(getResources().getColor(Status.fromString(shareInfo.getStatus()).color));
 
         Paint textPaint = new Paint();
         textPaint.setColor(Color.WHITE);
@@ -288,15 +288,13 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CODE_SHARE) {
+        if (resultCode == RESULT_OK && requestCode == CODE_SHARE) {
             ic_share.setImageDrawable(getResources().getDrawable(R.drawable.ic_close_share));
             ic_share.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     ic_share.setImageDrawable(getResources().getDrawable(R.drawable.ic_share));
-
-                    Intent intent = new Intent(TransitIasiMapActivity.this, ShareActivity.class);
-                    startActivityForResult(intent, CODE_SHARE);
+                    setupShare();
                 }
             });
         }
