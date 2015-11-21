@@ -23,6 +23,7 @@ import com.transitiasi.adapters.TransitIasiLinearLayoutManager;
 import com.transitiasi.adapters.TransportationAdapter;
 import com.transitiasi.model.DirectionResponse;
 import com.transitiasi.model.ShareInfo;
+import com.transitiasi.model.ShareInfoResponse;
 import com.transitiasi.retrofit.DirectionServiceApi;
 import com.transitiasi.retrofit.TransitIasiClientApi;
 import com.transitiasi.util.PolylineUtils;
@@ -251,20 +252,24 @@ public class ShareActivity extends AppCompatActivity {
         ReactiveLocationProvider locationProvider = new ReactiveLocationProvider(this);
         locationProvider.getLastKnownLocation()
                 .subscribe(new Action1<Location>() {
-                    @Override
-                    public void call(Location location) {
-                        Log.d("INFO2", location.getLatitude() + " " + location.getLongitude());
-                        shareInfo.setLat(location.getLatitude());
-                        shareInfo.setLng(location.getLongitude());
-                        if (shareInfo.getLabel() == null) {
-                            Toast.makeText(ShareActivity.this, R.string.please_select, Toast.LENGTH_SHORT).show();
-                        } else {
-                            sendInfo();
-                            Intent intent = new Intent(ShareActivity.this, TransitIasiMapActivity.class);
-                            startActivity(intent);
-                        }
-                    }
-                });
+                               @Override
+                               public void call(Location location) {
+                                   Log.d("INFO2", location.getLatitude() + " " + location.getLongitude());
+                                   shareInfo.setLat(location.getLatitude());
+                                   shareInfo.setLng(location.getLongitude());
+                                   if (shareInfo.getLabel() == null) {
+                                       Toast.makeText(ShareActivity.this, R.string.please_select, Toast.LENGTH_SHORT).show();
+                                   } else if (location.getLatitude() == 0 && location.getLongitude() == 0) {
+                                       Toast.makeText(ShareActivity.this, R.string.please_turn_on_location, Toast.LENGTH_SHORT).show();
+                                   } else {
+                                       sendInfo();
+                                       Intent intent = new Intent(ShareActivity.this, TransitIasiMapActivity.class);
+                                       startActivity(intent);
+                                   }
+                               }
+                           }
+
+                );
     }
 
     private void sendInfo() {
@@ -272,7 +277,7 @@ public class ShareActivity extends AppCompatActivity {
                 .shareLocation(shareInfo)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(Schedulers.newThread())
-                .subscribe(new Observer<String>() {
+                .subscribe(new Observer<ShareInfoResponse>() {
                     @Override
                     public void onCompleted() {
 
@@ -284,8 +289,8 @@ public class ShareActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onNext(String response) {
-
+                    public void onNext(ShareInfoResponse response) {
+                        Toast.makeText(ShareActivity.this, response.getResponse(), Toast.LENGTH_SHORT).show();
                     }
                 });
 
