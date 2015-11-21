@@ -1,8 +1,15 @@
 package com.transitiasi.util;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.transitiasi.model.DirectionResponse;
+import com.transitiasi.model.Leg;
+import com.transitiasi.model.Route;
+import com.transitiasi.model.Step;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -43,5 +50,32 @@ public class PolylineUtils {
         }
 
         return path;
+    }
+
+    public static List<LatLng> decodePath(DirectionResponse directionResponse) {
+
+
+        Route[] routes = directionResponse.getRoutes();
+        if (routes == null || routes.length == 0)
+            return Collections.emptyList();
+
+        for (Route route : routes) {
+            Leg[] legs = route.getLegs();
+            if (legs == null || legs.length == 0)
+                return Collections.emptyList();
+            for (Leg leg : legs) {
+                Step[] steps = leg.getSteps();
+                if (steps == null || steps.length == 0)
+                    return Collections.emptyList();
+                String polyline = steps[0].getPolyline().getPoints();
+
+                List<LatLng> coordinates = PolylineUtils.decode(polyline);
+                return  coordinates;
+            }
+        }
+
+
+        return Collections.emptyList();
+
     }
 }
