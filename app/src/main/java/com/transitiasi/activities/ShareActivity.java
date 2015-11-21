@@ -1,19 +1,26 @@
 package com.transitiasi.activities;
 
+import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.transitiasi.R;
+import com.transitiasi.enums.Status;
+import com.transitiasi.enums.TransportType;
 import com.transitiasi.adapters.TransitIasiLinearLayoutManager;
 import com.transitiasi.adapters.TransportationAdapter;
+import com.transitiasi.model.ShareInfo;
 import com.transitiasi.utils.TransportItem;
 
 import java.util.ArrayList;
@@ -21,10 +28,22 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import pl.charmas.android.reactivelocation.ReactiveLocationProvider;
+import rx.functions.Action1;
 
 public class ShareActivity extends AppCompatActivity {
     private static final String SELECTED = "selected";
     private static final String UNSELECTED = "unselected";
+    private IItemSelected itemSelected;
+    private List<TransportItem> trams;
+    private List<TransportItem> buses;
+    private List<TransportItem> minibuses;
+    private TransportationAdapter tramAdapter;
+    private TransportationAdapter busAdapter;
+    private TransportationAdapter minibusAdapter;
+    private ShareInfo shareInfo;
+
+
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
@@ -52,18 +71,31 @@ public class ShareActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.share_activity);
         ButterKnife.bind(this);
+        shareInfo = new ShareInfo();
         setSupportActionBar(toolbar);
         setupTramList();
         setupBusList();
         setupMiniBusList();
-        setupLevelOfOcupation();
+        setupLevelOfOccupation();
         setupToolBar();
     }
 
     private void setupToolBar() {
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setDisplayShowHomeEnabled(true);
+//        Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
+//        upArrow.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
+//        toolbar.setNavigationIcon(upArrow);
         View v = LayoutInflater.from(this).inflate(R.layout.share_activity_toolbar_layout, null);
         toolbar.addView(v);
         ImageView iv = (ImageView) v.findViewById(R.id.ic_validate);
+        iv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateCurrentLocation();
+                Log.d("INFO", shareInfo.getLat() + " " + shareInfo.getLng());
+            }
+        });
     }
 
 
@@ -72,7 +104,16 @@ public class ShareActivity extends AppCompatActivity {
         TextView tv_transportation = (TextView) card_tram.findViewById(R.id.tv_transportation);
         tv_transportation.setText(getString(R.string.tram));
         String[] tramNumbers = getResources().getStringArray(R.array.tram_numbers);
-        TransportationAdapter tramAdapter = new TransportationAdapter(ShareActivity.this, createItems(tramNumbers));
+        trams = createItems(tramNumbers);
+        tramAdapter = new TransportationAdapter(ShareActivity.this, trams, new IItemSelected() {
+            @Override
+            public void onClick(String transportationLabel) {
+                shareInfo.setLabel(transportationLabel);
+                shareInfo.setType(TransportType.T.toString());
+                emptyOtherList(buses, busAdapter);
+                emptyOtherList(minibuses, minibusAdapter);
+            }
+        });
         TransitIasiLinearLayoutManager lManager = new TransitIasiLinearLayoutManager(ShareActivity.this, LinearLayoutManager.HORIZONTAL, false);
         rv_trams.setHasFixedSize(true);
         rv_trams.setLayoutManager(lManager);
@@ -84,11 +125,20 @@ public class ShareActivity extends AppCompatActivity {
         TextView tv_transportation = (TextView) card_bus.findViewById(R.id.tv_transportation);
         tv_transportation.setText(getString(R.string.bus));
         String[] busNumbers = getResources().getStringArray(R.array.bus_numbers);
-        TransportationAdapter tramAdapter = new TransportationAdapter(ShareActivity.this, createItems(busNumbers));
+        buses = createItems(busNumbers);
+        busAdapter = new TransportationAdapter(ShareActivity.this, buses, new IItemSelected() {
+            @Override
+            public void onClick(String transportationLabel) {
+                shareInfo.setLabel(transportationLabel);
+                shareInfo.setType(TransportType.B.toString());
+                emptyOtherList(trams, tramAdapter);
+                emptyOtherList(minibuses, minibusAdapter);
+            }
+        });
         TransitIasiLinearLayoutManager lManager = new TransitIasiLinearLayoutManager(ShareActivity.this, LinearLayoutManager.HORIZONTAL, false);
         rv_trams.setHasFixedSize(true);
         rv_trams.setLayoutManager(lManager);
-        rv_trams.setAdapter(tramAdapter);
+        rv_trams.setAdapter(busAdapter);
 
     }
 
@@ -97,18 +147,28 @@ public class ShareActivity extends AppCompatActivity {
         TextView tv_transportation = (TextView) card_minibus.findViewById(R.id.tv_transportation);
         tv_transportation.setText(getString(R.string.minibus));
         String[] miniBusNumbers = getResources().getStringArray(R.array.minibus_numbers);
-        TransportationAdapter tramAdapter = new TransportationAdapter(ShareActivity.this, createItems(miniBusNumbers));
+        minibuses = createItems(miniBusNumbers);
+        minibusAdapter = new TransportationAdapter(ShareActivity.this, minibuses, new IItemSelected() {
+            @Override
+            public void onClick(String transportationLabel) {
+                shareInfo.setLabel(transportationLabel);
+                shareInfo.setType(TransportType.b.toString());
+                emptyOtherList(trams, tramAdapter);
+                emptyOtherList(buses, busAdapter);
+            }
+        });
         TransitIasiLinearLayoutManager lManager = new TransitIasiLinearLayoutManager(ShareActivity.this, LinearLayoutManager.HORIZONTAL, false);
         rv_trams.setHasFixedSize(true);
         rv_trams.setLayoutManager(lManager);
-        rv_trams.setAdapter(tramAdapter);
+        rv_trams.setAdapter(minibusAdapter);
     }
 
-    private void setupLevelOfOcupation() {
+    private void setupLevelOfOccupation() {
         iv_empty_transportation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (iv_empty_transportation.getTag() == null || iv_empty_transportation.getTag().equals(UNSELECTED)) {
+                    shareInfo.setStatus(Status.GREEN.toString());
                     iv_empty_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_empty_selected));
                     iv_empty_transportation.setTag(SELECTED);
                     iv_full_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_full_unselected));
@@ -126,6 +186,7 @@ public class ShareActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (iv_comfy_transportation.getTag() == null || iv_comfy_transportation.getTag().equals(UNSELECTED)) {
+                    shareInfo.setStatus(Status.ORANGE.toString());
                     iv_comfy_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_comfy_selected));
                     iv_comfy_transportation.setTag(SELECTED);
                     iv_full_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_full_unselected));
@@ -143,6 +204,7 @@ public class ShareActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (iv_full_transportation.getTag() == null || iv_full_transportation.getTag().equals(UNSELECTED)) {
+                    shareInfo.setStatus(Status.RED.toString());
                     iv_full_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_full_selected));
                     iv_full_transportation.setTag(SELECTED);
                     iv_empty_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_empty_unselected));
@@ -162,11 +224,47 @@ public class ShareActivity extends AppCompatActivity {
         for (int i = 0; i < strings.length; i++) {
             TransportItem item = new TransportItem();
             item.setNumber(strings[i]);
-            item.setSelection(false);
+            item.setSelected(false);
             items.add(item);
         }
         return items;
     }
 
+    private void emptyOtherList(List<TransportItem> items, TransportationAdapter adapter) {
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i).isSelected()) {
+                items.get(i).setSelected(false);
+                adapter.notifyDataSetChanged();
+                return;
+            }
+        }
+    }
+
+    private void updateCurrentLocation() {
+        ReactiveLocationProvider locationProvider = new ReactiveLocationProvider(this);
+        locationProvider.getLastKnownLocation()
+                .subscribe(new Action1<Location>() {
+                    @Override
+                    public void call(Location location) {
+                        Log.d("INFO2", location.getLatitude() + " " + location.getLongitude());
+                        shareInfo.setLat(location.getLatitude());
+                        shareInfo.setLng(location.getLongitude());
+                        if (shareInfo.getLabel() == null) {
+                            Toast.makeText(ShareActivity.this, R.string.please_select, Toast.LENGTH_SHORT).show();
+                        } else {
+                            sendInfo();
+                            Intent intent = new Intent(ShareActivity.this, TransitIasiMapActivity.class);
+                            startActivity(intent);
+                        }
+                    }
+                });
+    }
+
+    private void sendInfo() {
+    }
+
+    public interface IItemSelected {
+        void onClick(String transportationLabel);
+    }
 
 }

@@ -61,15 +61,30 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="@dimen/activity_horizontal_margin_medium"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-                <include layout="@layout/empty_transportation_layout" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin_medium"
+                    android:layout_marginRight="@dimen/activity_horizontal_margin_medium"
+                    android:text="@string/is_it_crowded"
+                    android:textSize="@dimen/text_size"
+                    android:layout_marginTop="@dimen/activity_horizontal_margin_medium"/>
 
-                <include layout="@layout/comfy_transportation_layout" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/activity_horizontal_margin_medium"
+                    android:orientation="horizontal">
 
-                <include layout="@layout/full_transportation_layout" />
+                    <include layout="@layout/empty_transportation_layout" />
+
+                    <include layout="@layout/comfy_transportation_layout" />
+
+                    <include layout="@layout/full_transportation_layout" />
+                </LinearLayout>
             </LinearLayout>
         </android.support.v7.widget.CardView>
     </LinearLayout>
