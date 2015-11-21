@@ -4,11 +4,13 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
@@ -39,7 +41,7 @@ import butterknife.OnClick;
 import rx.Observer;
 import rx.schedulers.Schedulers;
 
-public class TransitIasiMapActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCallback {
     private static final LatLng IASI = new LatLng(47.155649, 27.590058);
     private GoogleMap map;
 
@@ -102,6 +104,7 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
         //PolylineUtils.buildJsonForServer();
 
         init();
+
     }
 
     private void searchForRoute(String start, String destination) {
