@@ -6,25 +6,15 @@ import com.transitiasi.R;
  * Created by Anca Todirica on 21-Nov-15.
  */
 public enum Status {
-    GREEN, RED, ORANGE;
+    GREEN(R.color.green), RED(R.color.red), ORANGE(R.color.orange);
+    public final int color;
 
-    public static int getColor(String color) {
-        switch (color) {
-            case "GREEN":
-                return R.color.green;
-
-            case "RED":
-                return R.color.red;
-
-            case "ORANGE":
-                return R.color.orange;
-
-
-        }
-        return R.color.red;
+    Status(int color) {
+        this.color = color;
     }
-    public static Status fromString(String status){
-        switch (status){
+
+    public static Status fromString(String status) {
+        switch (status) {
             case "green":
                 return GREEN;
             case "orange":
@@ -33,6 +23,6 @@ public enum Status {
                 return RED;
         }
 
-        return null;
+        throw new IllegalArgumentException("Wrong input type, expected green, orange or red");
     }
 }
