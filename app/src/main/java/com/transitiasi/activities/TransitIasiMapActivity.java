@@ -26,6 +26,8 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.transitiasi.R;
 import com.transitiasi.model.DirectionResponse;
+import com.transitiasi.model.ShareInfo;
+import com.transitiasi.realtime.RealTimeScheduler;
 import com.transitiasi.retrofit.DirectionServiceApi;
 import com.transitiasi.util.PolylineUtils;
 
@@ -39,7 +41,7 @@ import butterknife.OnClick;
 import rx.Observer;
 import rx.schedulers.Schedulers;
 
-public class TransitIasiMapActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class TransitIasiMapActivity extends AppCompatActivity implements OnMapReadyCallback,RealTimeScheduler.OnRealtimeListener {
     private static final LatLng IASI = new LatLng(47.155649, 27.590058);
     private GoogleMap map;
 
@@ -92,6 +94,7 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
         //PolylineUtils.buildJsonForServer();
 
         init();
+        RealTimeScheduler.INSTANCE.setOnRealtimeListener(this);
     }
 
     private void searchForRoute(String start, String destination) {
@@ -209,4 +212,9 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
         map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds.build(), 10));
     }
 
+
+    @Override
+    public void onRealTime(List<ShareInfo> response) {
+
+    }
 }

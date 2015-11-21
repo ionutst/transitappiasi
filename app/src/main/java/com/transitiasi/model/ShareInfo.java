@@ -49,4 +49,9 @@ public class ShareInfo {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    @Override
+    public String toString() {
+        return label+type+status;
+    }
 }
