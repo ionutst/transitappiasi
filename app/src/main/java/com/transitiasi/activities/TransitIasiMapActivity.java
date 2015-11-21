@@ -62,6 +62,14 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
     void onGoClicked() {
         final String start = txtOrigin.getText().toString();
         final String end = txtDestination.getText().toString();
+        if (start.trim().isEmpty()) {
+            Toast.makeText(this, R.string.error_from_mandatory, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (end.trim().isEmpty()) {
+            Toast.makeText(this, R.string.error_destination_mandatory, Toast.LENGTH_LONG).show();
+            return;
+        }
         searchForRoute(start, end);
     }
 
@@ -69,7 +77,9 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.map_activity);
+
         ButterKnife.bind(this);
+
         View v = LayoutInflater.from(this).inflate(R.layout.share_toolbar, null);
         toolbar.addView(v);
         setSupportActionBar(toolbar);
