@@ -17,16 +17,13 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class ShareActivity extends AppCompatActivity {
-    @Bind(R.id.toolbar)
-    Toolbar toolbar;
-
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.share_activity);
         ButterKnife.bind(this);
-        
+
     }
 
     @Override
