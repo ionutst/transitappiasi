@@ -3,6 +3,7 @@ package com.transitiasi.activities;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +21,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class TransitIasiMapActivity extends FragmentActivity implements OnMapReadyCallback {
+public class TransitIasiMapActivity extends AppCompatActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
 
     @Bind(R.id.toolbar)
@@ -34,6 +35,7 @@ public class TransitIasiMapActivity extends FragmentActivity implements OnMapRea
         ButterKnife.bind(this);
         View v = LayoutInflater.from(this).inflate(R.layout.share_toolbar, null);
         toolbar.addView(v);
+        setSupportActionBar(toolbar);
 
         ImageView ic_share = (ImageView) v.findViewById(R.id.ic_share);
         ic_share.setOnClickListener(new View.OnClickListener() {
