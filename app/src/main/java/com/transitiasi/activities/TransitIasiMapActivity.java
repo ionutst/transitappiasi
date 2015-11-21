@@ -127,10 +127,18 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         RealTimeScheduler.INSTANCE.setOnRealtimeListener(this);
     }
 
+
     @Override
-    protected void onStop() {
-        super.onStop();
-        //RealTimeScheduler.INSTANCE.stop();
+    protected void onDestroy() {
+        super.onDestroy();
+        RealTimeScheduler.INSTANCE.stop();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        RealTimeScheduler.INSTANCE.stop();
+
     }
 
     private void searchForRoute(String start, String destination) {
@@ -283,7 +291,7 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         for(ShareInfo shareInfo:response){
             addTransportMarker(shareInfo);
         }
-        Log.d("realtime","onRealtime");
+        Log.d("realtime", "onRealtime");
     }
     private void addTransportMarker(ShareInfo shareInfo) {
 //        shareInfo.setLat(47.151135);
