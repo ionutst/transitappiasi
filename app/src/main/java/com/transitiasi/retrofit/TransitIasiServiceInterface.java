@@ -1,7 +1,9 @@
 package com.transitiasi.retrofit;
 
+import com.transitiasi.model.ShareInfo;
 import com.transitiasi.utils.TransportItem;
 
+import retrofit.http.Body;
 import retrofit.http.GET;
 import retrofit.http.POST;
 import retrofit.http.Query;
@@ -12,5 +14,5 @@ import rx.Observable;
  */
 public interface TransitIasiServiceInterface {
     @POST()
-    Observable<String> shareLocation(TransportItem transportItem);
+    Observable<String> shareLocation(@Body ShareInfo shareInfo);
 }

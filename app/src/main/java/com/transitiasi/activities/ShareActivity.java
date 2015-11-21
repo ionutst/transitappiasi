@@ -15,12 +15,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.transitiasi.R;
 import com.transitiasi.enums.Status;
 import com.transitiasi.enums.TransportType;
 import com.transitiasi.adapters.TransitIasiLinearLayoutManager;
 import com.transitiasi.adapters.TransportationAdapter;
+import com.transitiasi.model.DirectionResponse;
 import com.transitiasi.model.ShareInfo;
+import com.transitiasi.retrofit.DirectionServiceApi;
+import com.transitiasi.retrofit.TransitIasiClientApi;
+import com.transitiasi.util.PolylineUtils;
 import com.transitiasi.utils.TransportItem;
 
 import java.util.ArrayList;
@@ -29,7 +34,9 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import pl.charmas.android.reactivelocation.ReactiveLocationProvider;
+import rx.Observer;
 import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 public class ShareActivity extends AppCompatActivity {
     private static final String SELECTED = "selected";
@@ -261,6 +268,27 @@ public class ShareActivity extends AppCompatActivity {
     }
 
     private void sendInfo() {
+        TransitIasiClientApi.defaultService()
+                .shareLocation(shareInfo)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(Schedulers.newThread())
+                .subscribe(new Observer<String>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(String response) {
+
+                    }
+                });
+
     }
 
     public interface IItemSelected {
