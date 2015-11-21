@@ -1,10 +1,13 @@
 package com.transitiasi.util;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.transitiasi.model.DirectionResponse;
 import com.transitiasi.model.Leg;
 import com.transitiasi.model.Route;
 import com.transitiasi.model.Step;
+import com.transitiasi.retrofit.DirectionServiceApi;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,15 +70,47 @@ public class PolylineUtils {
                 Step[] steps = leg.getSteps();
                 if (steps == null || steps.length == 0)
                     return Collections.emptyList();
-                String polyline = steps[0].getPolyline().getPoints();
+                List<LatLng> allCoordinates = new ArrayList<>(steps.length * 30);
 
-                List<LatLng> coordinates = PolylineUtils.decode(polyline);
-                return  coordinates;
+                for (Step step : steps) {
+                    Log.d("travel_mode",step.getTravelMode());
+
+                    if(!DirectionServiceApi.MODE.equals(step.getTravelMode()))
+                        continue;
+                    String polyline = step.getPolyline().getPoints();
+
+                    List<LatLng> coordinates = PolylineUtils.decode(polyline);
+                    allCoordinates.addAll(coordinates);
+                }
+                return allCoordinates;
+
             }
         }
 
 
         return Collections.emptyList();
+
+    }
+
+    public static void buildJsonForServer() {
+        List<LatLng> coordinates = PolylineUtils.decode("o|}~G{fggDK]nOsL~D_DfKeIvRkOpB_BJAdAq@nCqB|@c@j@WHOFSJo@bAuFl@cC~CaLBId@oBd@wCxByMnCeQlBoM^mCtDsBFX");
+        StringBuilder sb = new StringBuilder(coordinates.size() * 50);
+        sb.append("[").append("\n");
+        for (int i = 0; i < coordinates.size(); i++) {
+            LatLng coordinate = coordinates.get(i);
+            sb.append("{\"lat\":")
+                    .append(coordinate.latitude)
+                    .append(",\"lng\":")
+                    .append(coordinate.longitude)
+                    .append("}");
+            if (i != coordinates.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+
+        final String json = sb.toString();
+        Log.d("json", json);
 
     }
 }
