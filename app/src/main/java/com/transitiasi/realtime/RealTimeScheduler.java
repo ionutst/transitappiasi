@@ -39,6 +39,7 @@ public class RealTimeScheduler {
     }
 
     private void register(){
+        Log.d("realtime","register");
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -55,6 +56,7 @@ public class RealTimeScheduler {
         if(stoped){
             return;
         }
+        Log.d("realtime","callservice");
         TransitIasiClientApi.defaultService()
                 .realtime(counter++)
                 .subscribeOn(Schedulers.newThread())
@@ -80,11 +82,14 @@ public class RealTimeScheduler {
     }
 
     public synchronized void start(){
+        Log.d("realtime","start");
+        stoped = false;
         register();
     }
 
     public synchronized void stop(){
         stoped = true;
+        Log.d("realtime","stoped");
     }
 
     public void setOnRealtimeListener(OnRealtimeListener listener){
