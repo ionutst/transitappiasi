@@ -8,13 +8,15 @@
         android:id="@+id/tv_transportation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/activity_horizontal_margin"
-        android:textSize="@dimen/text_size"/>
+        android:layout_marginLeft="@dimen/activity_horizontal_margin_medium"
+        android:layout_marginRight="@dimen/activity_horizontal_margin_medium"
+        android:layout_marginTop="@dimen/activity_horizontal_margin_medium"
+        android:textSize="@dimen/text_size" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_transportation"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textSize="@dimen/text_size"/>
+        android:textSize="@dimen/text_size" />
 
 </LinearLayout>

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.transitiasi.R;
+import com.transitiasi.activities.ShareActivity;
 import com.transitiasi.utils.TransportItem;
 
 import java.util.List;
@@ -21,10 +22,12 @@ import butterknife.ButterKnife;
 public class TransportationAdapter extends RecyclerView.Adapter<TransportationAdapter.TransportationViewHolder> {
     private List<TransportItem> transportationNumbers;
     private Context context;
+    private ShareActivity.IItemSelected itemSelected;
 
-    public TransportationAdapter(Context context, List<TransportItem> transportationNumbers) {
+    public TransportationAdapter(Context context, List<TransportItem> transportationNumbers, ShareActivity.IItemSelected itemSelected) {
         this.transportationNumbers = transportationNumbers;
         this.context = context;
+        this.itemSelected = itemSelected;
     }
 
     @Override
@@ -38,20 +41,21 @@ public class TransportationAdapter extends RecyclerView.Adapter<TransportationAd
     public void onBindViewHolder(final TransportationViewHolder holder, final int position) {
         final TransportItem item = transportationNumbers.get(position);
         final String transportationNumber = item.getNumber();
-        if(item.isSelection()){
+        if (item.isSelected()) {
             holder.tv_transportation_number.setBackgroundResource(R.drawable.circle_background);
-        }else{
+        } else {
             holder.tv_transportation_number.setBackgroundResource(R.drawable.circle_background_empy);
         }
         holder.tv_transportation_number.setText(transportationNumber);
         holder.tv_transportation_number.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                itemSelected.onClick(transportationNumber);
                 holder.tv_transportation_number.setBackgroundResource(R.drawable.circle_background);
                 for (int i = 0; i < transportationNumbers.size(); i++) {
-                    transportationNumbers.get(i).setSelection(false);
+                    transportationNumbers.get(i).setSelected(false);
                 }
-                transportationNumbers.get(position).setSelection(true);
+                transportationNumbers.get(position).setSelected(true);
                 notifyDataSetChanged();
             }
         });
