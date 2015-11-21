@@ -51,6 +51,7 @@ import rx.Observer;
 import rx.schedulers.Schedulers;
 
 public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCallback,RealTimeScheduler.OnRealtimeListener {
+    private static final int CODE_SHARE = 202;
     private static final LatLng IASI = new LatLng(47.155649, 27.590058);
     private GoogleMap map;
 
@@ -72,6 +73,7 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
 
     private String[] stations;
     private Map<String, String> stationsCoordinates;
+    private ImageView ic_share;
 
     //click listeners
     @OnClick(R.id.imgb_go)
@@ -100,12 +102,12 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         toolbar.addView(v);
         setSupportActionBar(toolbar);
 
-        ImageView ic_share = (ImageView) v.findViewById(R.id.ic_share);
+        ic_share = (ImageView) v.findViewById(R.id.ic_share);
         ic_share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(TransitIasiMapActivity.this, ShareActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, CODE_SHARE);
             }
         });
 
@@ -317,5 +319,20 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         addBusMarker(latLng, bmp);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CODE_SHARE) {
+            ic_share.setImageDrawable(getResources().getDrawable(R.drawable.ic_close_share));
+            ic_share.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ic_share.setImageDrawable(getResources().getDrawable(R.drawable.ic_share));
 
+                    Intent intent = new Intent(TransitIasiMapActivity.this, ShareActivity.class);
+                    startActivityForResult(intent, CODE_SHARE);
+                }
+            });
+        }
+    }
 }

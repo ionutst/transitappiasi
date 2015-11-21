@@ -312,6 +312,7 @@ public class ShareActivity extends BaseActivity {
                             public void run() {
                                 progress.setVisibility(View.GONE);
                                 Toast.makeText(ShareActivity.this, response.getResponse(), Toast.LENGTH_SHORT).show();
+                                setResult(RESULT_OK);
                                 finish();
                             }
                         });
