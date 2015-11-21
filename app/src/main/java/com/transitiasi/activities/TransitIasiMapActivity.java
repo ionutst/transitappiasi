@@ -3,7 +3,11 @@ package com.transitiasi.activities;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,6 +22,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -25,6 +31,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.transitiasi.R;
+import com.transitiasi.enums.Status;
 import com.transitiasi.model.DirectionResponse;
 import com.transitiasi.model.ShareInfo;
 import com.transitiasi.realtime.RealTimeScheduler;
@@ -60,6 +67,8 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
 
     private Polyline polyline;
     private List<Marker> markers = new ArrayList<>(4);
+
+    private List<Marker> busMarkers = new ArrayList<>(4);
 
     private String[] stations;
     private Map<String, String> stationsCoordinates;
@@ -203,6 +212,7 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         //map.addMarker(new MarkerOptions().position(sydney).title("Iasi"));
         //map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(IASI, (int) (map.getMaxZoomLevel() * 0.72)));
+
     }
 
     private void removeMarkers() {
@@ -251,15 +261,61 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         RealTimeScheduler.INSTANCE.start();
     }
 
+    private void removeBusMarkers(){
+        for(Marker marker:busMarkers){
+            marker.remove();
+        }
+    }
+    private void addBusMarker(LatLng latLng, Bitmap busMarker){
+        final Marker marker = map.addMarker(new MarkerOptions()
+                .position(latLng)
+                .icon(BitmapDescriptorFactory.fromBitmap(busMarker))
+                .anchor(0.5f, 1));
 
+        busMarkers.add(marker);
+    }
     @Override
     public void onRealTime(List<ShareInfo> response) {
         if(response == null){
             return;
         }
+        removeBusMarkers();
         for(ShareInfo shareInfo:response){
-            //call anca method
+            addTransportMarker(shareInfo);
         }
         Log.d("realtime","onRealtime");
     }
+    private void addTransportMarker(ShareInfo shareInfo) {
+//        shareInfo.setLat(47.151135);
+//        shareInfo.setLng(27.587258);
+//        shareInfo.setLabel("41");
+//        shareInfo.setStatus("RED");
+        LatLng latLng = new LatLng(shareInfo.getLat(), shareInfo.getLng());
+
+        Paint backgroundPaint = new Paint();
+
+        backgroundPaint.setColor(getResources().getColor(Status.fromString(shareInfo.getStatus()).color));
+
+        Paint textPaint = new Paint();
+        textPaint.setColor(Color.WHITE);
+        textPaint.setTextSize(30);
+        textPaint.setTextAlign(Paint.Align.CENTER);
+
+        backgroundPaint.setStyle(Paint.Style.FILL);
+        Bitmap.Config conf = Bitmap.Config.ARGB_8888;
+        final int size = 80;
+        final int padding = 5;
+
+        Bitmap bmp = Bitmap.createBitmap(size, size, conf);
+        Canvas canvas = new Canvas(bmp);
+        //canvas.drawColor(Color.RED);
+
+        canvas.drawCircle(size/2, size/2, size/2-padding, backgroundPaint);
+
+        canvas.drawText(shareInfo.getLabel(), size/2, size/2+10, textPaint); // paint defines the text color, stroke width, size
+
+        addBusMarker(latLng, bmp);
+    }
+
+
 }
