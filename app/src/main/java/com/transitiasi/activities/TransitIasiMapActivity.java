@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -39,8 +40,10 @@ import com.transitiasi.retrofit.DirectionServiceApi;
 import com.transitiasi.util.PolylineUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -65,6 +68,9 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
 
     private Polyline polyline;
     private List<Marker> markers = new ArrayList<>(4);
+
+    private String[] stations;
+    private Map<String, String> stationsCoordinates;
 
     //click listeners
     @OnClick(R.id.imgb_go)
@@ -110,6 +116,12 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
 
         //PolylineUtils.buildJsonForServer();
 
+        stations = getResources().getStringArray(R.array.stations);
+        stationsCoordinates = new HashMap<>(stations.length);
+        String[] stationsCoordinatesAsString = getResources().getStringArray(R.array.stations);
+        for (int i = 0; i < stationsCoordinatesAsString.length; i++) {
+            stationsCoordinates.put(stations[i], stationsCoordinatesAsString[i]);
+        }
         init();
 
     }
@@ -131,6 +143,16 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
 //                    }
 //                });
         progressDialog = ProgressDialog.show(this, null, getString(R.string.searching));
+
+//        start = "47.175776,27.571667";
+//        destination = "47.156013,27.603916";
+        if (stationsCoordinates.containsKey(start)) {
+            start = stationsCoordinates.get(start);
+        }
+        if (stationsCoordinates.containsKey(destination)) {
+            destination = stationsCoordinates.get(destination);
+        }
+        Log.d("coordinates", "start: " + start + " destination: " + destination);
 
         DirectionServiceApi.defaultService()
                 .getRoutes(DirectionServiceApi.MODE.toLowerCase(), start, destination, DirectionServiceApi.MAP_API_KEY, DirectionServiceApi.TRANSIT_MODE)
