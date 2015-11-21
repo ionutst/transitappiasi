@@ -26,6 +26,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+    }
 }
 
 dependencies {
@@ -43,5 +47,4 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.5.0'
     compile 'de.greenrobot:eventbus:3.0.0-beta1'
     compile 'com.jakewharton:butterknife:7.0.1'
-//    compile 'com.google.android.gms:play-services:8.3.0'
 }
