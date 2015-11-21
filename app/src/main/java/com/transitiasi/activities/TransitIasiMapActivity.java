@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -34,6 +36,11 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
+    @Bind(R.id.txt_destination)
+    AutoCompleteTextView txtDestination;
+
+    @Bind(R.id.txt_origin)
+    AutoCompleteTextView txtOrigin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +95,19 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
                     }
                 });
 
+        init();
+    }
 
+    private void init() {
+        addAutocompleteOptions(txtDestination);
+        addAutocompleteOptions(txtOrigin);
+    }
+    private void addAutocompleteOptions(AutoCompleteTextView autoCompleteTextView){
+        String[] items = getResources().getStringArray(R.array.stations);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>
+                (this, android.R.layout.select_dialog_item, items);
+        autoCompleteTextView.setThreshold(1);//will start working from first character
+        autoCompleteTextView.setAdapter(adapter);
     }
 
     @Override
@@ -106,6 +125,7 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
         PolylineOptions polylineOptions = new PolylineOptions();
         polylineOptions.addAll(coordinates);
         mMap.addPolyline(polylineOptions);
+
         LatLngBounds.Builder latLngBounds = new LatLngBounds.Builder();
         for (LatLng coordinate : coordinates) {
             latLngBounds.include(coordinate);

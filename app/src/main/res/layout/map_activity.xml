@@ -12,6 +12,88 @@
         android:background="?attr/colorPrimary"
         app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-    <include layout="@layout/activity_transit_iasi_map" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include layout="@layout/activity_transit_iasi_map" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="#b4ffffff">
+
+            <ImageButton
+                android:layout_width="@dimen/search_button_width"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:gravity="center"
+                android:src="@android:drawable/ic_menu_search"
+                style="@style/Base.Widget.AppCompat.Toolbar.Button.Navigation"
+                />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_marginRight="@dimen/search_button_width"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+                    <TextView
+                        style="@style/EditText.LocationLabel"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="A" />
+
+                    <AutoCompleteTextView
+                        android:id="@+id/txt_origin"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:hint="@string/start_address"
+                        android:singleLine="true"
+                        />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#c2bcbc"
+                    android:layout_marginLeft="8dp"
+                    />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+                    <TextView
+                        style="@style/EditText.LocationLabel"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="B" />
+
+                    <AutoCompleteTextView
+                        android:id="@+id/txt_destination"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:hint="@string/end_address"
+                        android:singleLine="true"
+                        />
+                </LinearLayout>
+
+            </LinearLayout>
+        </FrameLayout>
+    </FrameLayout>
 
 </LinearLayout>
