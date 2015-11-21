@@ -5,6 +5,9 @@
     <string name="tram">Tram</string>
     <string name="bus">Bus</string>
     <string name="minibus">Minibus</string>
+    <string name="empty_transportation">Empty</string>
+    <string name="comfy_transportation">Comfortable</string>
+    <string name="full_transportation">Full</string>
 
 
     <string-array name="tram_numbers">
