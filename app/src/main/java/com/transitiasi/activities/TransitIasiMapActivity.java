@@ -34,6 +34,7 @@ import com.transitiasi.model.DirectionResponse;
 import com.transitiasi.model.ShareInfo;
 import com.transitiasi.realtime.RealTimeScheduler;
 import com.transitiasi.retrofit.DirectionServiceApi;
+import com.transitiasi.util.CustomMarkerBuilder;
 import com.transitiasi.util.PolylineUtils;
 
 import java.util.ArrayList;
@@ -103,12 +104,9 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         setupShare();
 
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        //PolylineUtils.buildJsonForServer();
 
         stations = getResources().getStringArray(R.array.stations);
         stationsCoordinates = new HashMap<>(stations.length);
@@ -131,25 +129,9 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
     }
 
     private void searchForRoute(String start, String destination) {
-//        DirectionServiceApi.defaultService()
-//                .getRoutesUsingCall(DirectionServiceApi.MODE, start, destination, DirectionServiceApi.MAP_API_KEY, DirectionServiceApi.TRANSIT_MODE)
-//                .enqueue(new Callback<DirectionResponse>() {
-//                    @Override
-//                    public void onResponse(Response<DirectionResponse> response, Retrofit retrofit) {
-//                        int d = 0;
-//                        d++;
-//                    }
-//
-//                    @Override
-//                    public void onFailure(Throwable t) {
-//                        int d = 0;
-//                        d++;
-//                    }
-//                });
+
         progressDialog = ProgressDialog.show(this, null, getString(R.string.searching));
 
-//        start = "47.175776,27.571667";
-//        destination = "47.156013,27.603916";
         if (stationsCoordinates.containsKey(start)) {
             start = stationsCoordinates.get(start);
         }
@@ -193,9 +175,9 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
     }
 
     private void addAutocompleteOptions(AutoCompleteTextView autoCompleteTextView) {
-        String[] items = getResources().getStringArray(R.array.stations);
+
         ArrayAdapter<String> adapter = new ArrayAdapter<>
-                (this, android.R.layout.select_dialog_item, items);
+                (this, android.R.layout.select_dialog_item, stations);
         autoCompleteTextView.setThreshold(1);//will start working from first character
         autoCompleteTextView.setAdapter(adapter);
     }
@@ -204,10 +186,6 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        //LatLng sydney = new LatLng(47.155649, 27.590058);
-        //map.addMarker(new MarkerOptions().position(sydney).title("Iasi"));
-        //map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(IASI, (int) (map.getMaxZoomLevel() * 0.72)));
 
     }
@@ -290,28 +268,9 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
 //        shareInfo.setStatus("RED");
         LatLng latLng = new LatLng(shareInfo.getLat(), shareInfo.getLng());
 
-        Paint backgroundPaint = new Paint();
+        final Bitmap bmp = CustomMarkerBuilder.buildMarkerForBus(shareInfo, getResources());
 
-        backgroundPaint.setColor(getResources().getColor(Status.fromString(shareInfo.getStatus()).color));
-
-        Paint textPaint = new Paint();
-        textPaint.setColor(Color.WHITE);
-        textPaint.setTextSize(20);
-        textPaint.setTextAlign(Paint.Align.CENTER);
-
-        backgroundPaint.setStyle(Paint.Style.FILL);
-        Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-        Bitmap bmp = Bitmap.createBitmap(120, 120, conf);
-        Canvas canvas = new Canvas(bmp);
-
-        canvas.drawCircle(60, 60, 25, backgroundPaint);
-
-        canvas.drawText(shareInfo.getLabel(), 60, 65, textPaint); // paint defines the text color, stroke width, size
-        map.addMarker(new MarkerOptions()
-                        .position(latLng)
-                        .icon(BitmapDescriptorFactory.fromBitmap(bmp))
-                        .anchor(0.5f, 1)
-        );
+        addBusMarker(latLng, bmp);
     }
 
     @Override
