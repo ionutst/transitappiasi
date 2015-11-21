@@ -9,12 +9,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
@@ -36,6 +34,7 @@ import com.transitiasi.R;
 import com.transitiasi.enums.Status;
 import com.transitiasi.model.DirectionResponse;
 import com.transitiasi.model.ShareInfo;
+import com.transitiasi.realtime.RealTimeScheduler;
 import com.transitiasi.retrofit.DirectionServiceApi;
 import com.transitiasi.util.PolylineUtils;
 
@@ -51,7 +50,7 @@ import butterknife.OnClick;
 import rx.Observer;
 import rx.schedulers.Schedulers;
 
-public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCallback {
+public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCallback,RealTimeScheduler.OnRealtimeListener {
     private static final int CODE_SHARE = 202;
     private static final LatLng IASI = new LatLng(47.155649, 27.590058);
     private GoogleMap map;
@@ -69,6 +68,8 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
 
     private Polyline polyline;
     private List<Marker> markers = new ArrayList<>(4);
+
+    private List<Marker> busMarkers = new ArrayList<>(4);
 
     private String[] stations;
     private Map<String, String> stationsCoordinates;
@@ -125,7 +126,13 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
             stationsCoordinates.put(stations[i], stationsCoordinatesAsString[i]);
         }
         init();
+        RealTimeScheduler.INSTANCE.setOnRealtimeListener(this);
+    }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        RealTimeScheduler.INSTANCE.stop();
     }
 
     private void searchForRoute(String start, String destination) {
@@ -252,8 +259,34 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         }
 
         map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds.build(), 10));
+
+        RealTimeScheduler.INSTANCE.start();
     }
 
+    private void removeBusMarkers(){
+        for(Marker marker:busMarkers){
+            marker.remove();
+        }
+    }
+    private void addBusMarker(LatLng latLng, Bitmap busMarker){
+        final Marker marker = map.addMarker(new MarkerOptions()
+                .position(latLng)
+                .icon(BitmapDescriptorFactory.fromBitmap(busMarker))
+                .anchor(0.5f, 1));
+
+        busMarkers.add(marker);
+    }
+    @Override
+    public void onRealTime(List<ShareInfo> response) {
+        if(response == null){
+            return;
+        }
+        removeBusMarkers();
+        for(ShareInfo shareInfo:response){
+            addTransportMarker(shareInfo);
+        }
+        Log.d("realtime","onRealtime");
+    }
     private void addTransportMarker(ShareInfo shareInfo) {
 //        shareInfo.setLat(47.151135);
 //        shareInfo.setLng(27.587258);
@@ -263,26 +296,27 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
 
         Paint backgroundPaint = new Paint();
 
-        backgroundPaint.setColor(getResources().getColor(Status.getColor(shareInfo.getStatus())));
+        backgroundPaint.setColor(getResources().getColor(Status.fromString(shareInfo.getStatus()).color));
 
         Paint textPaint = new Paint();
         textPaint.setColor(Color.WHITE);
-        textPaint.setTextSize(20);
+        textPaint.setTextSize(30);
         textPaint.setTextAlign(Paint.Align.CENTER);
 
         backgroundPaint.setStyle(Paint.Style.FILL);
         Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-        Bitmap bmp = Bitmap.createBitmap(120, 120, conf);
+        final int size = 80;
+        final int padding = 5;
+
+        Bitmap bmp = Bitmap.createBitmap(size, size, conf);
         Canvas canvas = new Canvas(bmp);
+        //canvas.drawColor(Color.RED);
 
-        canvas.drawCircle(60, 60, 25, backgroundPaint);
+        canvas.drawCircle(size/2, size/2, size/2-padding, backgroundPaint);
 
-        canvas.drawText(shareInfo.getLabel(), 60, 65, textPaint); // paint defines the text color, stroke width, size
-        map.addMarker(new MarkerOptions()
-                        .position(latLng)
-                        .icon(BitmapDescriptorFactory.fromBitmap(bmp))
-                        .anchor(0.5f, 1)
-        );
+        canvas.drawText(shareInfo.getLabel(), size/2, size/2+10, textPaint); // paint defines the text color, stroke width, size
+
+        addBusMarker(latLng, bmp);
     }
 
     @Override
