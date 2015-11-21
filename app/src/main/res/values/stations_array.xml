@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="stations">
+        <item>Canta</item>
+        <item>Piata Unirii</item>
+        <item>Targu Cucu</item>
+        <item>Podu Ros</item>
+        <item>Baza 3</item>
+        <item>Copou</item>
+        <item>Universitate</item>
+        <item>Podu de piatra</item>
+        <item>Dancu</item>
+        <item>Billa-Gara</item>
+        <item>Gara</item>
+        <item>Tatarasi</item>
+        <item>Dacia</item>
+        <item>Tudor Vladimirescu </item>
+        <item>Primaverii</item>
+        <item>sos. Nationala</item>
+        <item>Gara Internationala</item>
+        <item>Piata Nicolina </item>
+        <item>Tatarasi Nord </item>
+        <item>Tutora </item>
+        <item>Frigorifer</item>
+        <item>Blocuri Cetatuia</item>
+        <item>CUG I </item>
+        <item>Triumf</item>
+        <item>Piata Independentei</item>
+        <item>Gara Nicolina</item>
+        <item>Mircea cel Batran</item>
+        <item>bd. Alexandru cel Bun </item>
+        <item>Bucium </item>
+        <item>Carrefour ERA</item>
+        <item>Tehnopolis </item>
+        <item>Blocuri Ciurea </item>
+        <item>Pacurari</item>
+        <item>Han Trei Sarmale</item>
+        <item>Aeroport</item>
+        <item>Breazu</item>
+        <item>Piata Mihai Eminescu</item>
+        <item>Tomesti</item>
+        <item>Tesatura</item>
+        <item>Frumoasa</item>
+        <item>Piata Dacia</item>
+        <item>Tatarasi Sud</item>
+        <item>Dispecer</item>
+        <item>Primaria Ciurea </item>
+        <item>Scoala Generala Picioru Lupului</item>
+        <item>Metro</item>
+        <item>Podu de Fier</item>
+        <item>Cimitirul Sf. Petru si Pavel</item>
+        <item>Ciric</item>
+        <item>Ateneu</item>
+        <item>str. Eternitate</item>
+        <item>Rond Copou</item>
+        <item>Copou - Stadion</item>
+        <item>Copou - George Cosbuc</item>
+        <item>Copou - Triumf</item>
+        <item>Filarmonica - Teatrul National</item>
+        <item>Hotel Europa</item>
+        <item>Elena Doamna</item>
+    </string-array>
+
+    <string-array name="stations_coordinates">
+        <item>47.174409, 27.548198</item>
+        <item>47.165833, 27.581063</item>
+        <item>47.164745, 27.590831</item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item>47.175776, 27.571667</item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item>47.167990, 27.580716</item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item>47.197235, 27.552266</item>
+        <item>47.169077, 27.576935</item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item></item>
+        <item>47.190946, 27.559413</item>
+        <item>47.186532, 27.562350</item>
+        <item>47.184435, 27.564160</item>
+        <item>47.181312, 27.567093</item>
+        <item>47.164417, 27.585476</item>
+        <item>47.161610, 27.593558</item>
+        <item>47.161855, 27.595306</item>
+
+    </string-array>
+</resources>
