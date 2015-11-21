@@ -1,6 +1,9 @@
 package com.transitiasi.activities;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -9,6 +12,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -16,31 +20,50 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.transitiasi.R;
 import com.transitiasi.model.DirectionResponse;
 import com.transitiasi.retrofit.DirectionServiceApi;
 import com.transitiasi.util.PolylineUtils;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import rx.Observer;
 import rx.schedulers.Schedulers;
 
 public class TransitIasiMapActivity extends AppCompatActivity implements OnMapReadyCallback {
-    private GoogleMap mMap;
+    private static final LatLng IASI = new LatLng(47.155649, 27.590058);
+    private GoogleMap map;
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
 
+    @Bind(R.id.txt_origin)
+    AutoCompleteTextView txtOrigin;
+
     @Bind(R.id.txt_destination)
     AutoCompleteTextView txtDestination;
 
-    @Bind(R.id.txt_origin)
-    AutoCompleteTextView txtOrigin;
+    private Dialog progressDialog;
+
+    private Polyline polyline;
+    private List<Marker> markers = new ArrayList<>(4);
+
+    //click listeners
+    @OnClick(R.id.imgb_go)
+    void onGoClicked() {
+        final String start = txtOrigin.getText().toString();
+        final String end = txtDestination.getText().toString();
+        searchForRoute(start, end);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,9 +75,9 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
         setSupportActionBar(toolbar);
 
         ImageView ic_share = (ImageView) v.findViewById(R.id.ic_share);
-                ic_share.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
+        ic_share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 Intent intent = new Intent(TransitIasiMapActivity.this, ShareActivity.class);
                 startActivity(intent);
             }
@@ -66,9 +89,31 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        //PolylineUtils.buildJsonForServer();
+
+        init();
+    }
+
+    private void searchForRoute(String start, String destination) {
+//        DirectionServiceApi.defaultService()
+//                .getRoutesUsingCall(DirectionServiceApi.MODE, start, destination, DirectionServiceApi.MAP_API_KEY, DirectionServiceApi.TRANSIT_MODE)
+//                .enqueue(new Callback<DirectionResponse>() {
+//                    @Override
+//                    public void onResponse(Response<DirectionResponse> response, Retrofit retrofit) {
+//                        int d = 0;
+//                        d++;
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Throwable t) {
+//                        int d = 0;
+//                        d++;
+//                    }
+//                });
+        progressDialog = ProgressDialog.show(this, null, getString(R.string.searching));
 
         DirectionServiceApi.defaultService()
-                .getRoutes("Copou", "Podu Ros", "AIzaSyD1kGlEz8q64IFtf1oqBEBlHA_WiuZYjI8")
+                .getRoutes(DirectionServiceApi.MODE.toLowerCase(), start, destination, DirectionServiceApi.MAP_API_KEY, DirectionServiceApi.TRANSIT_MODE)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(Schedulers.newThread())
                 .subscribe(new Observer<DirectionResponse>() {
@@ -79,8 +124,7 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
 
                     @Override
                     public void onError(Throwable e) {
-                        int d = 0;
-                        d++;
+                        progressDialog.dismiss();
                     }
 
                     @Override
@@ -89,20 +133,20 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                progressDialog.dismiss();
                                 displayPolyline(pathCoordinates);
                             }
                         });
                     }
                 });
-
-        init();
     }
 
     private void init() {
         addAutocompleteOptions(txtDestination);
         addAutocompleteOptions(txtOrigin);
     }
-    private void addAutocompleteOptions(AutoCompleteTextView autoCompleteTextView){
+
+    private void addAutocompleteOptions(AutoCompleteTextView autoCompleteTextView) {
         String[] items = getResources().getStringArray(R.array.stations);
         ArrayAdapter<String> adapter = new ArrayAdapter<>
                 (this, android.R.layout.select_dialog_item, items);
@@ -112,26 +156,57 @@ public class TransitIasiMapActivity extends AppCompatActivity implements OnMapRe
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        map = googleMap;
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(47.155649, 27.590058);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Iasi"));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, (int) (mMap.getMaxZoomLevel() * 0.72)));
+        //LatLng sydney = new LatLng(47.155649, 27.590058);
+        //map.addMarker(new MarkerOptions().position(sydney).title("Iasi"));
+        //map.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(IASI, (int) (map.getMaxZoomLevel() * 0.72)));
+    }
+
+    private void removeMarkers() {
+        Iterator<Marker> markerIterator = markers.iterator();
+        while (markerIterator.hasNext()) {
+            final Marker marker = markerIterator.next();
+            marker.remove();
+
+            markerIterator.remove();
+        }
+    }
+
+    private void addMarker(LatLng latLng) {
+        final Marker marker = map.addMarker(new MarkerOptions().position(latLng));
+        markers.add(marker);
+
     }
 
     private void displayPolyline(List<LatLng> coordinates) {
+        if (polyline != null)
+            polyline.remove();
+
+        if (coordinates == null || coordinates.size() < 2) {
+            Toast.makeText(this, R.string.no_route_found, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        removeMarkers();
+
+        addMarker(coordinates.get(0));
+        addMarker(coordinates.get(coordinates.size() - 1));
+
         PolylineOptions polylineOptions = new PolylineOptions();
         polylineOptions.addAll(coordinates);
-        mMap.addPolyline(polylineOptions);
+        polylineOptions.color(Color.BLUE);
+
+        polyline = map.addPolyline(polylineOptions);
 
         LatLngBounds.Builder latLngBounds = new LatLngBounds.Builder();
         for (LatLng coordinate : coordinates) {
             latLngBounds.include(coordinate);
         }
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds.build(), 10));
+        map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds.build(), 10));
     }
 
 }
