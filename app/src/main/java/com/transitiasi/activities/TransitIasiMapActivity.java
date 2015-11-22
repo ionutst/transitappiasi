@@ -29,8 +29,10 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.transitiasi.R;
 import com.transitiasi.model.DirectionResponse;
 import com.transitiasi.model.ShareInfo;
+import com.transitiasi.model.ShareInfoResponse;
 import com.transitiasi.realtime.RealTimeScheduler;
 import com.transitiasi.retrofit.DirectionServiceApi;
+import com.transitiasi.retrofit.TransitIasiClientApi;
 import com.transitiasi.util.CustomMarkerBuilder;
 import com.transitiasi.util.PolylineUtils;
 
@@ -44,6 +46,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCallback, RealTimeScheduler.OnRealtimeListener {
@@ -304,6 +307,31 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
     }
 
     private void stopSharing(){
+        TransitIasiClientApi.defaultService()
+                .stopShare()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ShareInfoResponse>() {
+                    @Override
+                    public void onCompleted() {
 
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("INFO", e.toString());
+                    }
+
+                    @Override
+                    public void onNext(final ShareInfoResponse response) {
+                        Log.d("INFO", response.getResponse());
+
+                        //progress.setVisibility(View.GONE);
+                        Toast.makeText(TransitIasiMapActivity.this, response.getResponse(), Toast.LENGTH_SHORT).show();
+                        //setResult(RESULT_OK);
+                        //finish();
+
+                    }
+                });
     }
 }
