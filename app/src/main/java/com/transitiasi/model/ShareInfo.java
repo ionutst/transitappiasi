@@ -60,4 +60,5 @@ public class ShareInfo {
     public String toString() {
         return label+type+status;
     }
+
 }
