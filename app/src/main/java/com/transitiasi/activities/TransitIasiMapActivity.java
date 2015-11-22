@@ -91,7 +91,7 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         ButterKnife.bind(this);
 
 
-        View v = LayoutInflater.from(this).inflate(R.layout.share_toolbar, null);
+        View v = LayoutInflater.from(this).inflate(R.layout.map_activity_toolbar_layout, null);
         toolbar.addView(v);
         setSupportActionBar(toolbar);
 

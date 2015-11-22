@@ -30,7 +30,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="right|center_vertical"
                 android:gravity="center"
-                android:src="@drawable/ic_action_navigation_check"
+                android:src="@drawable/ic_menu"
                 style="@style/Base.Widget.AppCompat.Toolbar.Button.Navigation"
                 />
 
