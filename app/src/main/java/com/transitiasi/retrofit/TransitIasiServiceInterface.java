@@ -22,6 +22,6 @@ public interface TransitIasiServiceInterface {
     Observable<List<ShareInfo>> realtime(@Query("iteration") int iteration);
 
     @POST("/stopShare")
-    Observable<ShareInfoResponse> stopShare();
+    Observable<ShareInfoResponse> stopShare(@Body ShareInfo shareInfo);
 }
 

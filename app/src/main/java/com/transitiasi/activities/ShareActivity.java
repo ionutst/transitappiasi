@@ -1,9 +1,7 @@
 package com.transitiasi.activities;
 
-import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,19 +14,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.transitiasi.R;
 import com.transitiasi.enums.Status;
 import com.transitiasi.enums.TransportType;
 import com.transitiasi.adapters.TransitIasiLinearLayoutManager;
 import com.transitiasi.adapters.TransportationAdapter;
-import com.transitiasi.model.DirectionResponse;
 import com.transitiasi.model.ShareInfo;
 import com.transitiasi.model.ShareInfoResponse;
-import com.transitiasi.retrofit.DirectionServiceApi;
 import com.transitiasi.retrofit.TransitIasiClientApi;
 import com.transitiasi.util.PlatformUtils;
-import com.transitiasi.util.PolylineUtils;
 import com.transitiasi.utils.TransportItem;
 
 import java.util.ArrayList;
@@ -53,7 +47,10 @@ public class ShareActivity extends BaseActivity {
     private TransportationAdapter busAdapter;
     private TransportationAdapter minibusAdapter;
     private ShareInfo shareInfo;
-
+    private final ImageView[] statusViews = new ImageView[3];
+    private final int[] selectedIcons = {R.drawable.ic_empty_selected, R.drawable.ic_comfy_selected, R.drawable.ic_full_selected};
+    private final int[] unselectedIcons = {R.drawable.ic_empty_unselected, R.drawable.ic_comfy_unselected, R.drawable.ic_full_unselected};
+    private final Status[] statuses = {Status.GREEN, Status.ORANGE, Status.RED};
 
     @Bind(R.id.toolbar)
     Toolbar toolbar;
@@ -85,21 +82,48 @@ public class ShareActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.share_activity);
         ButterKnife.bind(this);
+        createViewsList();
         shareInfo = new ShareInfo();
         setSupportActionBar(toolbar);
         setupTramList();
         setupBusList();
         setupMiniBusList();
-        setupLevelOfOccupation();
         setupToolBar();
+        setupChangesInStatus();
+    }
+
+    private void createViewsList() {
+        statusViews[0] = iv_empty_transportation;
+        statusViews[1] = iv_comfy_transportation;
+        statusViews[2] = iv_full_transportation;
+    }
+
+    private void setupChangesInStatus() {
+        for (int i = 0; i < statusViews.length; i++) {
+            final int position = i;
+            statusViews[i].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setSelection(position);
+                    shareInfo.setStatus(statuses[position].toString());
+                }
+            });
+        }
+    }
+
+
+    private void setSelection(int index) {
+        for (int i = 0; i < statusViews.length; i++) {
+            if (i == index) {
+                statusViews[i].setImageResource(selectedIcons[i]);
+                shareInfo.setStatus(Status.ORANGE.toString());
+            } else {
+                statusViews[i].setImageResource(unselectedIcons[i]);
+            }
+        }
     }
 
     private void setupToolBar() {
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setDisplayShowHomeEnabled(true);
-//        Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
-//        upArrow.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
-//        toolbar.setNavigationIcon(upArrow);
         View v = LayoutInflater.from(this).inflate(R.layout.share_activity_toolbar_layout, null);
         toolbar.addView(v);
         ImageView iv = (ImageView) v.findViewById(R.id.ic_validate);
@@ -181,61 +205,6 @@ public class ShareActivity extends BaseActivity {
         rv_trams.setAdapter(minibusAdapter);
     }
 
-    private void setupLevelOfOccupation() {
-        iv_empty_transportation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (iv_empty_transportation.getTag() == null || iv_empty_transportation.getTag().equals(UNSELECTED)) {
-                    shareInfo.setStatus(Status.GREEN.toString());
-                    iv_empty_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_empty_selected));
-                    iv_empty_transportation.setTag(SELECTED);
-                    iv_full_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_full_unselected));
-                    iv_full_transportation.setTag(UNSELECTED);
-                    iv_comfy_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_comfy_unselected));
-                    iv_comfy_transportation.setTag(UNSELECTED);
-                } else {
-                    iv_empty_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_empty_unselected));
-                    iv_empty_transportation.setTag(UNSELECTED);
-                }
-            }
-        });
-
-        iv_comfy_transportation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (iv_comfy_transportation.getTag() == null || iv_comfy_transportation.getTag().equals(UNSELECTED)) {
-                    shareInfo.setStatus(Status.ORANGE.toString());
-                    iv_comfy_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_comfy_selected));
-                    iv_comfy_transportation.setTag(SELECTED);
-                    iv_full_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_full_unselected));
-                    iv_full_transportation.setTag(UNSELECTED);
-                    iv_empty_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_empty_unselected));
-                    iv_empty_transportation.setTag(UNSELECTED);
-                } else {
-                    iv_comfy_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_comfy_unselected));
-                    iv_comfy_transportation.setTag(UNSELECTED);
-                }
-            }
-        });
-
-        iv_full_transportation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (iv_full_transportation.getTag() == null || iv_full_transportation.getTag().equals(UNSELECTED)) {
-                    shareInfo.setStatus(Status.RED.toString());
-                    iv_full_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_full_selected));
-                    iv_full_transportation.setTag(SELECTED);
-                    iv_empty_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_empty_unselected));
-                    iv_empty_transportation.setTag(UNSELECTED);
-                    iv_comfy_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_comfy_unselected));
-                    iv_comfy_transportation.setTag(UNSELECTED);
-                } else {
-                    iv_full_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_full_unselected));
-                    iv_full_transportation.setTag(UNSELECTED);
-                }
-            }
-        });
-    }
 
     private List<TransportItem> createItems(String[] strings) {
         List<TransportItem> items = new ArrayList<>(strings.length);
