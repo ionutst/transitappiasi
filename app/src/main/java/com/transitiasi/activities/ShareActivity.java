@@ -38,6 +38,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import pl.charmas.android.reactivelocation.ReactiveLocationProvider;
 import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
@@ -237,7 +238,7 @@ public class ShareActivity extends BaseActivity {
     }
 
     private List<TransportItem> createItems(String[] strings) {
-        List<TransportItem> items = new ArrayList<>();
+        List<TransportItem> items = new ArrayList<>(strings.length);
         for (int i = 0; i < strings.length; i++) {
             TransportItem item = new TransportItem();
             item.setNumber(strings[i]);
@@ -292,7 +293,7 @@ public class ShareActivity extends BaseActivity {
         TransitIasiClientApi.defaultService()
                 .shareLocation(shareInfo)
                 .subscribeOn(Schedulers.newThread())
-                .observeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<ShareInfoResponse>() {
                     @Override
                     public void onCompleted() {
@@ -307,15 +308,12 @@ public class ShareActivity extends BaseActivity {
                     @Override
                     public void onNext(final ShareInfoResponse response) {
                         Log.d("INFO", response.getResponse());
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                progress.setVisibility(View.GONE);
-                                Toast.makeText(ShareActivity.this, response.getResponse(), Toast.LENGTH_SHORT).show();
-                                setResult(RESULT_OK);
-                                finish();
-                            }
-                        });
+
+                        progress.setVisibility(View.GONE);
+                        Toast.makeText(ShareActivity.this, response.getResponse(), Toast.LENGTH_SHORT).show();
+                        setResult(RESULT_OK);
+                        finish();
+
                     }
                 });
 
