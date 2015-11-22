@@ -308,7 +308,7 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
 
     private void stopSharing(){
         TransitIasiClientApi.defaultService()
-                .stopShare()
+                .stopShare(new ShareInfo())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<ShareInfoResponse>() {
