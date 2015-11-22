@@ -27,6 +27,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.transitiasi.R;
+import com.transitiasi.activities.controllers.MapController;
 import com.transitiasi.model.DirectionResponse;
 import com.transitiasi.model.ShareInfo;
 import com.transitiasi.model.ShareInfoResponse;
@@ -65,14 +66,11 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
 
     private Dialog progressDialog;
 
-    private Polyline polyline;
-    private List<Marker> markers = new ArrayList<>(4);
-    private List<Marker> busMarkers = new ArrayList<>(4);
 
     private String[] stations;
     private Map<String, String> stationsCoordinates;
     private ImageView ic_share;
-
+    private MapController mapController;
     //click listeners
     @OnClick(R.id.imgb_go)
     void onGoClicked() {
@@ -95,6 +93,7 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         setContentView(R.layout.map_activity);
 
         ButterKnife.bind(this);
+
 
         View v = LayoutInflater.from(this).inflate(R.layout.share_toolbar, null);
         toolbar.addView(v);
@@ -202,44 +201,28 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         map = googleMap;
 
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(IASI, (int) (map.getMaxZoomLevel() * 0.72)));
-
+        mapController = new MapController(map);
     }
 
-    private void removeMarkers() {
-        Iterator<Marker> markerIterator = markers.iterator();
-        while (markerIterator.hasNext()) {
-            final Marker marker = markerIterator.next();
-            marker.remove();
-
-            markerIterator.remove();
-        }
-    }
-
-    private void addMarker(LatLng latLng) {
-        final Marker marker = map.addMarker(new MarkerOptions().position(latLng));
-        markers.add(marker);
-
-    }
 
     private void displayPolyline(List<LatLng> coordinates) {
-        if (polyline != null)
-            polyline.remove();
+        mapController.removePolyline();
+        mapController.removeMarkers();
 
         if (coordinates == null || coordinates.size() < 2) {
             Toast.makeText(this, R.string.no_route_found, Toast.LENGTH_SHORT).show();
             return;
         }
 
-        removeMarkers();
 
-        addMarker(coordinates.get(0));
-        addMarker(coordinates.get(coordinates.size() - 1));
+        mapController.addMarker(coordinates.get(0));
+        mapController.addMarker(coordinates.get(coordinates.size() - 1));
 
         PolylineOptions polylineOptions = new PolylineOptions();
         polylineOptions.addAll(coordinates);
         polylineOptions.color(Color.BLUE);
 
-        polyline = map.addPolyline(polylineOptions);
+        mapController.addPolyline(polylineOptions);
 
         LatLngBounds.Builder latLngBounds = new LatLngBounds.Builder();
         for (LatLng coordinate : coordinates) {
@@ -251,27 +234,12 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
         RealTimeScheduler.INSTANCE.start();
     }
 
-    private void removeBusMarkers() {
-        for (Marker marker : busMarkers) {
-            marker.remove();
-        }
-    }
-
-    private void addBusMarker(LatLng latLng, Bitmap busMarker) {
-        final Marker marker = map.addMarker(new MarkerOptions()
-                .position(latLng)
-                .icon(BitmapDescriptorFactory.fromBitmap(busMarker))
-                .anchor(0.5f, 1));
-
-        busMarkers.add(marker);
-    }
-
     @Override
     public void onRealTime(List<ShareInfo> response) {
         if (response == null) {
             return;
         }
-        removeBusMarkers();
+        mapController.removeBusMarkers();
         for (ShareInfo shareInfo : response) {
             addTransportMarker(shareInfo);
         }
@@ -279,15 +247,12 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
     }
 
     private void addTransportMarker(ShareInfo shareInfo) {
-//        shareInfo.setLat(47.151135);
-//        shareInfo.setLng(27.587258);
-//        shareInfo.setLabel("41");
-//        shareInfo.setStatus("RED");
+
         LatLng latLng = new LatLng(shareInfo.getLat(), shareInfo.getLng());
 
         final Bitmap bmp = CustomMarkerBuilder.buildMarkerForBus(shareInfo, getResources());
 
-        addBusMarker(latLng, bmp);
+        mapController.addBusMarker(latLng, bmp);
     }
 
     @Override
@@ -326,10 +291,7 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
                     public void onNext(final ShareInfoResponse response) {
                         Log.d("INFO", response.getResponse());
 
-                        //progress.setVisibility(View.GONE);
                         Toast.makeText(TransitIasiMapActivity.this, response.getResponse(), Toast.LENGTH_SHORT).show();
-                        //setResult(RESULT_OK);
-                        //finish();
 
                     }
                 });
