@@ -295,10 +295,15 @@ public class TransitIasiMapActivity extends BaseActivity implements OnMapReadyCa
             ic_share.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    stopSharing();
                     ic_share.setImageDrawable(getResources().getDrawable(R.drawable.ic_share));
                     setupShare();
                 }
             });
         }
+    }
+
+    private void stopSharing(){
+
     }
 }
