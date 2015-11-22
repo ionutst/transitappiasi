@@ -18,7 +18,7 @@ import rx.schedulers.Schedulers;
  */
 public class RealTimeScheduler {
 
-    public static final int REALTIME_DELAY = 2000;
+    public static final int REALTIME_DELAY = 3000;
 
     private OnRealtimeListener listener;
     private boolean stoped = false;

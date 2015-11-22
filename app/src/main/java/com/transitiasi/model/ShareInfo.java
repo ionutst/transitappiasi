@@ -49,7 +49,11 @@ public class ShareInfo {
     }
 
     public void setStatus(String status) {
-        this.status = status;
+        if(status == null){
+            throw new IllegalArgumentException("status is null");
+        }
+
+        this.status = status.toLowerCase();
     }
 
     @Override

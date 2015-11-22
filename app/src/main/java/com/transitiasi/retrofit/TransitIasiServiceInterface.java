@@ -1,9 +1,7 @@
 package com.transitiasi.retrofit;
 
 import com.transitiasi.model.ShareInfo;
-import com.transitiasi.model.ShareInfo;
 import com.transitiasi.model.ShareInfoResponse;
-import com.transitiasi.utils.TransportItem;
 
 import java.util.List;
 
@@ -22,5 +20,8 @@ public interface TransitIasiServiceInterface {
 
     @GET("/realtime")
     Observable<List<ShareInfo>> realtime(@Query("iteration") int iteration);
+
+    @POST("/stopShare")
+    Observable<ShareInfoResponse> stopShare();
 }
 
