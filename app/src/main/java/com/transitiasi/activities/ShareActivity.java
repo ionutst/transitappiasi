@@ -95,11 +95,6 @@ public class ShareActivity extends BaseActivity {
     }
 
     private void setupToolBar() {
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setDisplayShowHomeEnabled(true);
-//        Drawable upArrow = getResources().getDrawable(R.drawable.abc_ic_ab_back_mtrl_am_alpha);
-//        upArrow.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
-//        toolbar.setNavigationIcon(upArrow);
         View v = LayoutInflater.from(this).inflate(R.layout.share_activity_toolbar_layout, null);
         toolbar.addView(v);
         ImageView iv = (ImageView) v.findViewById(R.id.ic_validate);
@@ -187,14 +182,14 @@ public class ShareActivity extends BaseActivity {
             public void onClick(View v) {
                 if (iv_empty_transportation.getTag() == null || iv_empty_transportation.getTag().equals(UNSELECTED)) {
                     shareInfo.setStatus(Status.GREEN.toString());
-                    iv_empty_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_empty_selected));
+                    iv_empty_transportation.setImageResource(R.drawable.ic_empty_selected);
                     iv_empty_transportation.setTag(SELECTED);
-                    iv_full_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_full_unselected));
+                    iv_full_transportation.setImageResource(R.drawable.ic_full_unselected);
                     iv_full_transportation.setTag(UNSELECTED);
-                    iv_comfy_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_comfy_unselected));
+                    iv_comfy_transportation.setImageResource(R.drawable.ic_comfy_unselected);
                     iv_comfy_transportation.setTag(UNSELECTED);
                 } else {
-                    iv_empty_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_empty_unselected));
+                    iv_empty_transportation.setImageResource(R.drawable.ic_empty_unselected);
                     iv_empty_transportation.setTag(UNSELECTED);
                 }
             }
@@ -205,14 +200,14 @@ public class ShareActivity extends BaseActivity {
             public void onClick(View v) {
                 if (iv_comfy_transportation.getTag() == null || iv_comfy_transportation.getTag().equals(UNSELECTED)) {
                     shareInfo.setStatus(Status.ORANGE.toString());
-                    iv_comfy_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_comfy_selected));
+                    iv_comfy_transportation.setImageResource(R.drawable.ic_comfy_selected);
                     iv_comfy_transportation.setTag(SELECTED);
-                    iv_full_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_full_unselected));
+                    iv_full_transportation.setImageResource(R.drawable.ic_full_unselected);
                     iv_full_transportation.setTag(UNSELECTED);
-                    iv_empty_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_empty_unselected));
+                    iv_empty_transportation.setImageResource(R.drawable.ic_empty_unselected);
                     iv_empty_transportation.setTag(UNSELECTED);
                 } else {
-                    iv_comfy_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_comfy_unselected));
+                    iv_comfy_transportation.setImageResource(R.drawable.ic_comfy_unselected);
                     iv_comfy_transportation.setTag(UNSELECTED);
                 }
             }
@@ -223,14 +218,14 @@ public class ShareActivity extends BaseActivity {
             public void onClick(View v) {
                 if (iv_full_transportation.getTag() == null || iv_full_transportation.getTag().equals(UNSELECTED)) {
                     shareInfo.setStatus(Status.RED.toString());
-                    iv_full_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_full_selected));
+                    iv_full_transportation.setImageResource(R.drawable.ic_full_selected);
                     iv_full_transportation.setTag(SELECTED);
-                    iv_empty_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_empty_unselected));
+                    iv_empty_transportation.setImageResource(R.drawable.ic_empty_unselected);
                     iv_empty_transportation.setTag(UNSELECTED);
-                    iv_comfy_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_comfy_unselected));
+                    iv_comfy_transportation.setImageResource(R.drawable.ic_comfy_unselected);
                     iv_comfy_transportation.setTag(UNSELECTED);
                 } else {
-                    iv_full_transportation.setImageDrawable(getResources().getDrawable(R.drawable.ic_full_unselected));
+                    iv_full_transportation.setImageResource(R.drawable.ic_full_unselected);
                     iv_full_transportation.setTag(UNSELECTED);
                 }
             }
